@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission Control: enrollment queue prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;color-scheme:light;
+--bg:#FFFFFF;--side:#F7F7F6;--sunk:#F2F1EF;--ink:#1D1B18;--muted:#5F5A52;--faint:#8A847A;--line:#E7E5E1;
+--accent:#D2560B;--accent-hover:#B8490A;--accent-soft:#FFF3EA;--red:#B42318;--red-soft:#FDEEEC;--blue:#1D4FB8;--blue-soft:#EEF3FC;
+--green:#1C6E43;--green-soft:#E7F4EC;--warn-bg:#FFF5D6;--warn-ink:#6F4B00}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Geist,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{margin:0;letter-spacing:-.01em}
+#app{height:100%;padding-top:env(safe-area-inset-top,0px)}
+.app{display:grid;grid-template-columns:220px 1fr;height:100%}
+.side{background:var(--side);border-right:1px solid var(--line);padding:12px 10px;overflow:auto}
+.logo{padding:4px 8px 18px}.logo b{font-weight:700}.logo span{color:var(--faint);font-size:12px;margin-left:10px}
+.nav{display:flex;justify-content:space-between;width:100%;border:0;background:transparent;padding:6px 8px;border-radius:7px;text-align:left;font-size:14px}
+.nav span{color:var(--faint);font-size:12px}
+.nav:hover{background:#EEEDEA}.nav.on{background:#E9E8E4;font-weight:500}
+.navh{color:var(--faint);font-size:13px;padding:22px 8px 6px}
+.mainwrap{display:flex;flex-direction:column;min-width:0;min-height:0}
+.pagebar{display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid var(--line);flex:none}
+.pagebar h1{font-size:20px;font-weight:600}
+.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px}
+.grow{flex:1}
+.body{flex:1;min-height:0;overflow:auto}
+.small{font-size:12.5px;color:var(--muted)}
+.ml{display:inline-flex;flex-wrap:wrap;gap:0 10px}
+.mono{font-family:"Geist Mono",ui-monospace,monospace}
+.reason{font-size:12.5px;font-weight:500}
+.late{color:var(--red)}.soon{color:var(--blue)}.ok{color:var(--muted)}.good{color:var(--green)}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:5px;background:var(--sunk);color:var(--muted);font-weight:500}
+.tag.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.tag.good{background:var(--green-soft);color:var(--green)}
+.btn{border:1px solid var(--line);background:var(--bg);padding:8px 14px;border-radius:8px;font-weight:500;white-space:nowrap;display:inline-flex;align-items:center}
+.btn:hover:not(:disabled){border-color:var(--faint)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink)}
+.btn.oncall{background:var(--green);border-color:var(--green);color:#fff}
+kbd{font-family:"Geist Mono",ui-monospace,monospace;font-size:10.5px;padding:0 5px;border-radius:4px;background:var(--sunk);color:var(--muted);margin-left:6px;border:1px solid var(--line)}
+.btn.primary kbd{background:rgba(255,255,255,.22);color:#fff;border-color:transparent}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline;font-size:12.5px}
+/* tasks layout */
+.tasks{display:grid;grid-template-columns:370px minmax(0,1fr) 280px;height:100%}
+.qcol{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.qtop{flex:none}
+.qalert{padding:12px 16px;border-bottom:1px solid var(--line)}
+.qalert.urgent{background:var(--red-soft)}.qalert.urgent strong{color:var(--red)}
+.qalert.info{background:var(--blue-soft)}.qalert.info strong{color:var(--blue)}
+.qalert.offer{background:var(--accent-soft)}
+.qalert-row{display:flex;align-items:center;gap:10px}
+.qalert-row strong{flex:1;font-weight:600;font-size:13.5px}
+.qalert .small{margin-top:2px}
+.cd{font-family:"Geist Mono",ui-monospace,monospace;font-size:14px;font-variant-numeric:tabular-nums;color:var(--red)}
+.qbar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.qscroll{flex:1;overflow:auto;min-height:0}
+.ghead{display:flex;justify-content:space-between;background:var(--side);padding:7px 16px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1}
+.qitem{display:flex;gap:12px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:var(--bg);padding:12px 16px;border-left:3px solid transparent}
+.qitem:hover{background:#FAFAF9}
+.qitem.active{background:var(--accent-soft);border-left-color:var(--accent)}
+.qitem.mine{background:var(--green-soft);border-left-color:var(--green)}
+.qn{flex:none;width:22px;height:22px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;font-size:11.5px;color:var(--muted);background:var(--bg)}
+.qitem.active .qn{background:var(--accent);border-color:var(--accent);color:#fff}
+.qbody{display:flex;flex-direction:column;gap:2px;min-width:0}
+.qtitle{font-weight:500}
+.qbody .tag{align-self:flex-start;margin-top:3px}
+.qempty{padding:32px 20px;color:var(--muted);text-align:center}
+.hint{flex:none;display:flex;flex-wrap:wrap;gap:4px 14px;padding:8px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.hint kbd{margin:0 3px 0 0}
+.center{overflow:auto;min-height:0}
+.crumbs{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 28px;border-bottom:1px solid var(--line);min-height:48px}
+.crumbs .ml span+span::before{content:"›";margin-right:10px;color:var(--faint)}
+.crumbs .ml{gap:0 10px}
+.detail{max-width:760px;margin:0 auto;padding:28px 32px 120px}
+.detail h1{font-size:24px;font-weight:600}
+.lead{color:var(--muted);margin:6px 0 10px;max-width:68ch}
+.sh{font-size:15px;font-weight:600;margin:26px 0 10px;display:flex;align-items:center;gap:8px}
+.count{font-size:12px;color:var(--muted);font-weight:400}
+.box{border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.pad{padding:12px 16px}
+.plain{margin:0 0 6px;padding-left:18px}
+.callcard{display:flex;border:1px solid #F3C9A8;border-radius:10px;overflow:hidden;background:#FFFBF7}
+.date{flex:none;width:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #F3C9A8;background:var(--accent-soft);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.date b{font-size:26px;color:var(--ink);letter-spacing:0;line-height:1.2}
+.callbody{flex:1;padding:14px 18px;min-width:0}
+.callhead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.callbody dl{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;margin:0}
+.callbody dt{color:var(--muted);font-size:13px}.callbody dd{margin:0}
+details.box summary{cursor:pointer;font-weight:600;padding:12px 16px;list-style:none;display:flex;justify-content:space-between}
+details.box{margin-top:26px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"Show";color:var(--muted);font-weight:400;font-size:13px}
+details[open] summary::after{content:"Hide"}
+details ol{margin:0;padding:0 16px 4px 36px}details ol li{margin-bottom:8px;max-width:64ch}
+.tl{display:flex;flex-direction:column;gap:10px}
+.tlnote{border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.tlrow{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:0 4px}
+.capture>div{padding:14px 16px}.capture>div+div{border-top:1px solid var(--line)}
+.lbl{font-weight:500;margin-bottom:4px;display:block}
+.req{color:var(--red);font-size:12px;font-weight:500;margin-left:8px}.req.met{color:var(--green)}
+input,textarea,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px}
+input{width:100%;padding:9px 12px;margin-top:8px}
+textarea{width:100%;min-height:100px;resize:vertical;border:0;border-bottom:1px solid var(--line);border-radius:10px 10px 0 0;padding:12px 16px;display:block}
+select{padding:5px 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--bg);padding:5px 12px;border-radius:999px;font-size:13px}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.outcomes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.outcomes .btn{justify-content:space-between;padding:10px 12px}
+.outcomes .btn[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.panel{margin-top:12px;padding:14px 16px;border-radius:10px;background:var(--sunk)}
+.panel .row{margin-bottom:12px}
+.err{color:var(--red);font-size:13px;margin-top:10px}
+.resfoot{border-top:1px solid var(--line);margin-top:14px;padding-top:10px}
+.check{width:36px;height:36px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center}
+.lines{margin:14px 0 0;padding:0;list-style:none;max-width:560px}
+.lines li{padding:8px 0;border-top:1px solid var(--line)}
+.props{border-left:1px solid var(--line);overflow:auto;padding:20px}
+.psec+.psec{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.ph{font-size:12px;color:var(--muted);letter-spacing:.06em;margin-bottom:12px}
+.pdl{display:grid;grid-template-columns:100px 1fr;gap:10px 10px;margin:0;font-size:13.5px}
+.pdl dt{color:var(--muted)}.pdl dd{margin:0}
+.plink{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.dot{width:8px;height:8px;border-radius:2px;flex:none}
+/* manager */
+.mgr{max-width:1000px;margin:0 auto;padding:24px 24px 120px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.tile{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:16px 18px}
+.tile:hover{border-color:var(--faint)}
+.tile[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tile.hot{background:var(--red-soft);border-color:#F2C7C1}
+.tile .n{font-size:32px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile.hot .n{color:var(--red)}
+.tile .t{font-weight:500;margin-top:4px}
+.tile .sub{font-size:13px;color:var(--muted)}
+.tile .sub.alarm{color:var(--red);font-weight:500}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{font-size:12px;font-weight:500;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.right{text-align:right;white-space:nowrap}
+.caption{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 14px 6px}
+.caption h3{font-size:15px;font-weight:600}
+.meta{color:var(--muted);font-size:13px}
+.stepper{display:inline-flex;align-items:center;gap:8px}
+.stepper button{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.stepper b{min-width:30px;text-align:center;font-variant-numeric:tabular-nums}
+.holding{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.hcard{border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13.5px}
+.hname{font-weight:500;margin-bottom:4px}
+.toggle{width:38px;height:22px;border-radius:999px;border:0;background:#D9D6D0;position:relative;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.toggle[aria-pressed=true]{background:var(--green)}.toggle[aria-pressed=true]::after{left:19px}
+.agent{display:flex;gap:10px;align-items:center}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}.tchips .chip{font-size:12px;padding:3px 10px}
+.note-line{font-size:12px;margin-top:6px}
+.off td{opacity:.55}
+/* prototype switcher */
+.switcher{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:4px;background:#1D1B18;border-radius:10px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.switcher button{border:0;background:transparent;color:#BDB7AD;padding:7px 12px;border-radius:7px;font-size:13px;white-space:nowrap}
+.switcher button[aria-pressed=true]{background:#3A3732;color:#fff;box-shadow:inset 0 0 0 1px #5A564F}
+.switcher button:hover{color:#fff}
+.sep{width:1px;height:20px;background:#3A3732;margin:0 4px}
+.demo{position:relative}
+.pop{position:absolute;right:0;bottom:calc(100% + 10px);width:310px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.16)}
+.pop button{display:block;width:100%;text-align:left;color:var(--ink);padding:10px 12px;border-radius:8px}
+.pop button:hover{background:var(--sunk);color:var(--ink)}
+.pop small{display:block;color:var(--muted);font-size:12px}
+.pop hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:10px;max-width:min(560px,calc(100% - 32px));z-index:50;font-size:14px}
+@media (max-width:1280px){.tasks{grid-template-columns:340px minmax(0,1fr)}.props{display:none}}
+@media (max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.tasks{grid-template-columns:1fr;height:auto}.qcol{max-height:50vh}.tiles{grid-template-columns:1fr}.outcomes{grid-template-columns:repeat(2,1fr)}body{overflow:auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* manager v2 */
+.qitem.mq{align-items:center}
+.mqc{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums;font-size:15px}
+.detail.wide{max-width:900px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:10px;margin-top:18px}
+.stats>div{padding:12px 16px;display:flex;flex-direction:column}
+.stats>div+div{border-left:1px solid var(--line)}
+.stats b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.sh .linkbtn{margin-left:auto;font-weight:400;font-size:13px}
+.chip.static{cursor:default;background:var(--sunk);border-color:transparent}
+.chip:disabled{opacity:.5}
+.empty-line{padding:12px 14px;border-radius:8px;background:var(--red-soft);font-size:13.5px;font-weight:500}
+.seg2{display:inline-flex;background:var(--sunk);border-radius:8px;padding:3px;margin-bottom:12px}
+.seg2 button{border:0;background:transparent;padding:5px 12px;border-radius:6px;font-size:13px;color:var(--muted)}
+.seg2 button[aria-pressed=true]{background:var(--bg);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:500}
+.live{padding:9px 0;border-bottom:1px solid var(--line)}
+.live:last-child{border-bottom:0}
+.props .psec .small+.small{margin-top:4px}
+.matrix th.c,.matrix td.c{text-align:center;width:86px}
+.matrix th.c{white-space:normal;line-height:1.3;vertical-align:bottom}
+.cb{width:17px;height:17px;accent-color:var(--accent);cursor:pointer;margin:0}
+.matrix .tag{margin-top:4px}
+.totals td{background:var(--side);font-size:12.5px;font-weight:500}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stats>div:nth-child(3){border-left:0;border-top:1px solid var(--line)}.stats>div:nth-child(4){border-top:1px solid var(--line)}}
+/* v3 */
+.stats{grid-template-columns:repeat(5,1fr)}
+.stat{border:0;background:transparent;text-align:left;padding:12px 16px;display:flex;flex-direction:column}
+.stat+.stat{border-left:1px solid var(--line)}
+.stat:hover{background:#FAFAF9}
+.stat[aria-pressed=true]{background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)}
+.stat b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat:first-child{border-radius:10px 0 0 10px}.stat:last-child{border-radius:0 10px 10px 0}
+.vsep{width:1px;height:20px;background:var(--line);margin:0 6px}
+.crumbs label select{margin-left:6px}
+.touch{margin:0 0 4px;padding:8px 12px;background:var(--sunk);border-radius:8px}
+.blockbox{margin-top:12px;padding:10px 14px;border-radius:8px;border:1px dashed #C9C4BB;background:#FAFAF9}
+.blockbox b{font-weight:500;font-size:13.5px}
+.placeholder{max-width:640px;margin:0 auto;padding:60px 24px}
+.floatcard{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:45;width:320px;background:var(--red-soft);border:1px solid #F2C7C1;border-radius:12px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.14)}
+.floatcard strong{color:var(--red);font-weight:600;font-size:13.5px}
+.outsel{font-size:12px;padding:2px 4px;margin-top:2px}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat+.stat{border-left:0}}
+/* badges */
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.5;white-space:nowrap;margin-left:auto;flex:none}
+.badge.neutral{background:#EDEBE7;color:#3F3B35}
+.badge.muted{background:#F4F3F1;color:#9A948A;font-weight:500}
+.badge.red{background:#FCE3E0;color:#A61F14}
+.badge.amber{background:#FDEFC8;color:#7A4E00}
+.badge.green{background:#DDF1E5;color:#17613A}
+.badge.xs{font-size:11px;padding:0 7px;min-width:0;margin-left:6px;vertical-align:1px}
+.badge.lg{font-size:17px;padding:3px 12px;margin:6px 0 0;align-self:flex-start}
+.qitem.mq .badge{align-self:center}
+/* unified neutral selection */
+.qitem.active{background:#EFEEEB;border-left-color:var(--accent)}
+.qitem.active:hover{background:#EAE9E5}
+.qitem.active .qn{background:var(--ink);border-color:var(--ink);color:#fff}
+/* WCAG pass: text >= 4.5:1, control boundaries >= 3:1, badges separated from any background */
+:root{--faint:#6F695F;--accent:#B64A08;--accent-hover:#9C3F06;--control:#8C867C}
+.btn,.chip,input,textarea,select,.stepper button,.qn{border-color:var(--control)}
+.btn.ghost{border-color:transparent}
+.btn.primary{border-color:var(--accent)}
+.chip.static{border-color:transparent;background:#E9E7E3;color:var(--ink)}
+.box textarea{border-width:0 0 1px}
+.nav span,.logo span{color:var(--faint)}
+.badge{font-variant-numeric:normal;border:1px solid transparent}
+.badge.neutral{background:#FFFFFF;border-color:#A9A399;color:#2B2824}
+.badge.muted{background:#FFFFFF;border-color:#C9C4BC;color:#5F5A52}
+.badge.red{background:#FCE3E0;border-color:#D9786E;color:#8E1A10}
+.badge.amber{background:#FDEFC8;border-color:#C9962B;color:#5E3C00}
+.badge.green{background:#DDF1E5;border-color:#6FB38B;color:#12512F}
+.stat[aria-pressed=true]{background:#EFEEEB;box-shadow:inset 0 -2px 0 var(--accent)}
+.stat:hover{background:#F5F4F2}
+.toggle{background:#8C867C}
+.qitem.active .reason.ok,.qitem.active .small{color:#524D46}
+.badge.neutral{border-color:#8C867C}.badge.muted{border-color:#9E988E}.badge.red{border-color:#C24A3F}.badge.amber{border-color:#9C7212}.badge.green{border-color:#3F8C60}
+.badge.muted{border-color:#8C867C}
+/* call card v2 */
+.cc{border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.cc-top{display:flex;align-items:center;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.cal{flex:none;width:52px;border-radius:9px;overflow:hidden;text-align:center;background:#F4F2EF;box-shadow:0 0 0 1px rgba(0,0,0,.04)}
+.cal span{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;color:#fff;padding:3px 0 2px}
+.cal b{display:block;font-size:20px;font-weight:600;line-height:1.35;padding:2px 0 4px;color:var(--ink)}
+.cal.red span{background:#C0362C}
+.cal.orange span{background:#B64A08}
+.cal.neutral span{background:#5F5A52}
+.cc-title{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cc-title b{font-size:16px;font-weight:600}
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px 20px;margin:0;padding:16px 18px}
+.cc-grid dt{font-size:12.5px;color:var(--muted);margin-bottom:2px}
+.cc-grid dd{margin:0}
+.cc-grid .tag{margin-top:4px}
+.stepper.sm{gap:6px}.stepper.sm button{width:24px;height:24px}.stepper.sm b{min-width:26px;font-size:13px}
+.stepper.over b{color:var(--blue)}
+td .linkbtn{margin-left:8px}
+/* alert cards v2 */
+.alert{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--bg);position:relative}
+.alert::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.alert.red{background:#FDF1EF}.alert.red::before{background:#C0362C}
+.alert.blue{background:#F2F6FD}.alert.blue::before{background:#1D4FB8}
+.alert.orange{background:#FFF6EE}.alert.orange::before{background:#B64A08}
+.a-icon{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--bg);border:1px solid var(--line)}
+.alert.red .a-icon{color:#B42318;border-color:#EDC0BA}
+.alert.blue .a-icon{color:#1D4FB8;border-color:#C3D2F0}
+.alert.orange .a-icon{color:#9C3F06;border-color:#EDCBB2}
+.a-body{flex:1;min-width:0}
+.a-head{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.a-label{font-size:12.5px;font-weight:600}
+.alert.red .a-label{color:#A61F14}.alert.blue .a-label{color:#1A46A3}.alert.orange .a-label{color:#8E3A05}
+.a-pill{font-family:"Geist Mono",ui-monospace,monospace;font-size:12.5px;font-weight:500;padding:1px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.alert.red .a-pill{color:#A61F14;border-color:#D9786E}
+.alert.blue .a-pill{color:#1A46A3;border-color:#8FA9DF}
+.a-pill .cd{font-size:inherit;color:inherit}
+.a-name{font-size:15px;font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.a-meta{display:flex;flex-wrap:wrap;gap:0 10px;font-size:12.5px;color:var(--muted)}
+.a-meta span+span::before{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:currentColor;vertical-align:middle;margin-right:10px;opacity:.6}
+.a-note{font-size:12.5px;color:var(--muted);margin-top:6px}
+.a-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
+.mgr .alert,.center .alert{border:1px solid var(--line);border-radius:10px;margin:0 0 12px;overflow:hidden}
+.qscroll .alert,.floatcard .alert{border-radius:0}
+.floatcard{padding:0;background:transparent;border:0;overflow:hidden;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.16)}
+.floatcard .alert{border:1px solid #EDC0BA;border-radius:12px}
+/* compact alerts */
+.alert{align-items:center;gap:12px;padding:10px 14px 10px 16px}
+.a-main{flex:1;min-width:0}
+.a-head{justify-content:flex-start;gap:8px}
+.a-label{font-size:12px}
+.a-pill{font-size:11.5px;padding:0 7px;line-height:1.6}
+.a-name{font-size:14.5px;margin-top:1px;line-height:1.35}
+.a-meta{font-size:12px}
+.a-note{margin-top:3px;font-size:12px}
+.a-actions{flex:none;margin:0;flex-direction:column;align-items:stretch;gap:4px}
+.a-actions .btn.ghost{padding:2px 6px;font-size:12px;justify-content:center}
+.a-actions{flex-direction:column-reverse}
+.box textarea{border-color:var(--line);line-height:1.7}
+.box textarea:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
+.notef{padding:6px 0}
+.nrow{display:grid;grid-template-columns:104px 1fr;align-items:start;gap:8px;padding:0 16px}
+.nrow+.nrow{border-top:1px solid var(--line)}
+.nlbl{font-weight:600;padding:9px 0;font-size:14px}
+.notef textarea{min-height:0;border:0!important;border-radius:0;padding:9px 0;resize:none;overflow:hidden;line-height:1.5;background:transparent}
+.notef textarea:focus{outline:none;box-shadow:none}
+.nrow:focus-within{box-shadow:inset 3px 0 0 var(--accent)}
+.notef + .small{border-top:1px solid var(--line)}
+/* align column header bars */
+.qbar,.crumbs{height:52px;min-height:52px;box-sizing:border-box;padding-top:0;padding-bottom:0}
+.qbar{flex:none}
+.qbar .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* timeline v2 */
+.tl2{position:relative;padding-left:28px}
+.tl2::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.tl-day{font-size:13px;color:var(--muted);margin:18px 0 8px}
+.tl-day:first-child{margin-top:0}
+.tl-ev{position:relative;display:flex;gap:16px;align-items:flex-start;padding:7px 0}
+.tl-dot{position:absolute;left:-26px;top:13px;width:10px;height:10px;border-radius:3px;background:#5F5A52;box-shadow:0 0 0 3px var(--bg)}
+.tl-txt{flex:1;min-width:0;line-height:1.7}
+.tl-time{flex:none;font-size:13px;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.tl-pill{display:inline-block;background:#EFEEEB;border-radius:6px;padding:0 7px;font-size:13px;font-weight:500;line-height:1.6;margin:0 1px}
+.tl-note{margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#FAFAF9;font-size:13.5px;line-height:1.5}
+/* collapsible side panels */
+.app{transition:grid-template-columns .2s ease}
+.app.nav-closed{grid-template-columns:0 1fr}
+.app.nav-closed .side{padding:0;border-right:0;overflow:hidden;visibility:hidden}
+.tasks{transition:grid-template-columns .2s ease}
+.body.props-closed .tasks{grid-template-columns:370px minmax(0,1fr) 0}
+.body.props-closed .props{padding:0;border-left:0;overflow:hidden;visibility:hidden}
+.iconbtn{width:34px;height:34px;display:grid;place-items:center;border:1px solid transparent;background:transparent;border-radius:8px;color:var(--muted);flex:none}
+.iconbtn:hover{background:var(--sunk);color:var(--ink)}
+.iconbtn[aria-pressed=false]{border-color:var(--control);color:var(--ink)}
+.pagebar{padding-left:14px;padding-right:14px}
+.focus-tag{font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+@media (max-width:1280px){.body.props-closed .tasks{grid-template-columns:340px minmax(0,1fr)}}
+/* custom select */
+select{-webkit-appearance:none;appearance:none;height:30px;padding:0 30px 0 10px;font-size:13px;font-weight:500;line-height:28px;border:1px solid var(--control);border-radius:8px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235F5A52' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;color:var(--ink);cursor:pointer;vertical-align:middle}
+select:hover{border-color:var(--ink)}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+td select{min-width:128px}
+.outsel{height:24px;line-height:22px;font-size:12px;padding:0 26px 0 8px;background-position:right 8px center}
+/* agent picker */
+.tokens{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.token{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 4px 0 11px;border-radius:8px;background:#EFEEEB;font-size:13px;font-weight:500}
+.token button{width:22px;height:22px;display:grid;place-items:center;border:0;background:transparent;border-radius:5px;color:var(--muted)}
+.token button:hover{background:#E2E0DB;color:var(--ink)}
+.apick{position:relative}
+.apick .btn.sm{height:30px}
+.apop{position:absolute;left:0;top:calc(100% + 6px);z-index:20;width:300px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.14);overflow:hidden}
+.apop input{margin:0;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 12px;font-size:13.5px}
+.apop input:focus{outline:none;box-shadow:inset 0 -2px 0 var(--accent)}
+.aopts{max-height:260px;overflow:auto;padding:4px}
+.aopt{display:flex;flex-direction:column;align-items:flex-start;width:100%;border:0;background:transparent;text-align:left;padding:8px 10px;border-radius:7px}
+.aopt:hover:not(:disabled){background:var(--sunk)}
+.aopt>span:first-child{font-weight:500;font-size:13.5px}
+.aopt[hidden]{display:none}
+.live-seg{margin-bottom:6px;display:flex}.live-seg button{flex:1}
+td:has(.stepper.sm){white-space:nowrap}
+.resetbtn{width:26px;height:26px;margin-left:4px;display:inline-grid;place-items:center;vertical-align:middle;border:0;background:transparent;border-radius:6px;color:var(--muted)}
+.resetbtn:hover{background:var(--sunk);color:var(--ink)}
+td.reason{white-space:nowrap}
+/* stats v3 */
+.stats2{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
+.st{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;padding:12px 14px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;position:relative}
+.st:hover{border-color:#B9B4AB}
+.st[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.st-l{font-size:12.5px;color:var(--muted)}
+.st-n{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.st-s{font-size:12px;color:var(--muted)}
+.st.red .st-n{color:#A61F14}
+.st.amber .st-n{color:#7A4E00}
+.st.zero .st-n{color:#9A948A}
+.st-bar{align-self:stretch;height:4px;border-radius:2px;background:#EFEEEB;margin-top:8px;overflow:hidden}
+.st-bar span{display:block;height:100%;border-radius:2px;background:#8C867C}
+.st.red .st-bar span{background:#C0362C}
+.st.amber .st-bar span{background:#C9962B}
+@media (max-width:900px){.stats2{grid-template-columns:repeat(2,1fr)}}
+/* queue tabs */
+.qmeta{font-size:13.5px;color:var(--muted);margin:-4px 0 0}
+.qmeta b{font-weight:600;color:var(--ink)}.qmeta b.late{color:var(--red)}
+.tabsbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);margin-bottom:12px;flex-wrap:wrap}
+.tabs2{display:flex;gap:4px}
+.tabs2 button{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;padding:8px 10px 10px;font-size:13.5px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs2 button:hover{color:var(--ink)}
+.tabs2 button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs2 .badge{margin:0;font-size:11.5px;min-width:24px;padding:0 7px}
+.tabsbar label{padding-bottom:8px}
+/* cards v4 */
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.card2{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;min-height:88px}
+.card2:hover{border-color:#B9B4AB}
+.card2[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.c-l{font-size:12.5px;color:var(--muted)}
+.c-n{font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.25;margin-top:2px}
+.c-s{font-size:12px;color:var(--muted);margin-top:auto}
+.card2.red .c-n{color:#A61F14}.card2.amber .c-n{color:#7A4E00}.card2.zero .c-n{color:#9A948A}
+.card2.red{box-shadow:inset 3px 0 0 #C0362C}.card2.amber{box-shadow:inset 3px 0 0 #C9962B}
+.card2.red[aria-pressed=true]{box-shadow:inset 3px 0 0 #C0362C,inset 0 0 0 1px var(--ink)}
+.card2.amber[aria-pressed=true]{box-shadow:inset 3px 0 0 #C9962B,inset 0 0 0 1px var(--ink)}
+.tabsbar.plain{align-items:center;padding-bottom:8px}
+.tabsbar.plain label{padding-bottom:0}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+/* simple cards */
+.card3{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.card3:hover{border-color:#B9B4AB}
+.card3[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.card3 .c-n{font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1.2;color:var(--ink)}
+.card3 .c-l{font-size:13.5px;font-weight:600;color:var(--ink);margin-top:6px}
+.card3 .c-s{font-size:12.5px;color:var(--muted);min-height:18px}
+.card3.zero .c-n{color:#9A948A}
+.card3[aria-pressed=true]{border-color:var(--line);box-shadow:inset 0 -3px 0 var(--accent);background:#F5F4F2}
+.card3.red .c-n{color:#A61F14}
+.card3.amber .c-n{color:#7A4E00}
+/* softer controls: neutral grey boundary (3:1), no olive tint */
+:root{--control:#8F8F8F}
+select{height:32px;border-color:#C7C7C7;box-shadow:0 1px 0 rgba(0,0,0,.04);border-radius:8px;background-color:#fff;font-weight:500}
+select:hover{border-color:#8F8F8F}
+.ctl-label{display:inline-flex;align-items:center;gap:8px}
+.ctl-label select{margin:0}
+/* segmented stepper */
+.stepper{display:inline-flex;align-items:center;gap:0;height:32px;border:1px solid #C7C7C7;border-radius:8px;background:#fff;overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.stepper button{width:30px;height:100%;border:0;border-radius:0;background:transparent;color:var(--muted);font-size:16px;line-height:1}
+.stepper button:hover{background:var(--sunk);color:var(--ink)}
+.stepper b{min-width:36px;height:100%;display:grid;place-items:center;border-left:1px solid #E4E4E4;border-right:1px solid #E4E4E4;font-size:13.5px}
+.stepper.sm{height:28px}.stepper.sm button{width:26px;height:100%}.stepper.sm b{min-width:32px;font-size:13px}
+.crumbs .small+.stepper{margin-left:8px}
+.card3 .c-l,.card3 .c-s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+select,.stepper{border-color:#949494}
+select:hover{border-color:#5F5F5F}
+/* light controls, Mintlify-style */
+:root{--control:#DDDBD7}
+.btn,.chip,input,textarea,.stepper,select,.qn{border-color:#DDDBD7}
+.btn:hover:not(:disabled),select:hover,.fsel:hover{border-color:#BDBAB4}
+.btn,.stepper,.fsel,select{box-shadow:0 1px 2px rgba(16,16,16,.05)}
+.btn.primary{border-color:var(--accent)}
+.fsel{display:inline-flex;align-items:center;height:32px;border:1px solid #DDDBD7;border-radius:9px;background:#fff;padding-left:11px;box-shadow:0 1px 2px rgba(16,16,16,.05);cursor:pointer}
+.fsel .fl,.stepper .fl{font-size:13px;color:var(--muted);white-space:nowrap}
+.fsel select{border:0;box-shadow:none;height:30px;padding-left:6px;background-color:transparent}
+.fsel:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.fsel select:focus-visible{outline:none}
+.stepper{border-color:#DDDBD7;border-radius:9px}
+.stepper.labeled .fl{padding:0 8px 0 11px;border-right:1px solid #ECEAE6;height:100%;display:grid;place-items:center}
+.stepper b{border-color:#ECEAE6}
+.toggle{background:#C9C6C0}
+.stepper,.stepper.sm{gap:0}
+.stepper.sm{height:32px}
+.stepper.sm button{width:28px}
+.stepper button:first-child{border-radius:8px 0 0 8px}
+.stepper button:last-child{border-radius:0 8px 8px 0}
+.stepper.labeled button:first-of-type{border-radius:0}
+td select{height:32px}
+/* custom dropdown */
+.dd{position:relative;display:inline-block;vertical-align:middle}
+.ddbtn{gap:6px;padding:0 10px 0 11px;font:inherit;font-size:13px;color:var(--ink)}
+.ddbtn .dv{font-weight:500;white-space:nowrap}
+.ddbtn .dv.dph{color:var(--muted);font-weight:500}
+.ddbtn .chev{color:var(--muted);flex:none;margin-left:2px}
+.ddbtn[aria-expanded=true]{border-color:#BDBAB4;background:#FAFAF9}
+.ddbtn[aria-expanded=true] .chev{transform:rotate(180deg)}
+.dd.sm .ddbtn{height:26px;font-size:12px;padding:0 8px;margin-top:3px}
+.ddpop{z-index:60;text-align:left}
+.dopt{gap:1px}
+.drow{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%}
+.drow svg{color:var(--accent);flex:none}
+.dopt[aria-selected=true]>.drow>span{font-weight:600}
+.dopt[hidden]{display:none}
+td .dd .ddbtn{min-width:132px;justify-content:space-between}
+/* dropdown trigger: hard reset so text sits centered */
+.dd .ddbtn{display:inline-flex!important;align-items:center!important;box-sizing:border-box;height:32px;margin:0;padding:0 10px 0 11px;line-height:1;letter-spacing:normal;font-family:Geist,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px;text-align:left;vertical-align:middle}
+.dd .ddbtn>span{display:inline-flex;align-items:center;height:100%;line-height:1.2}
+.dd .ddbtn .chev{display:block}
+.dd.sm .ddbtn{height:26px;margin-top:3px;font-size:12px;padding:0 8px}
+table{min-width:560px}
+.casecell .qtitle,.casecell .small{white-space:nowrap}
+.casecell .reason{margin-top:2px}
+.stats2,.cards{grid-template-columns:repeat(auto-fit,minmax(128px,1fr))}
+.aopt .small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.aopt{min-width:0}
+.cards{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.card3{padding:12px 12px 12px 13px}
+.card3 .c-l{font-size:12.5px}
+.card3 .c-s{font-size:12px}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+.resetbtn2{height:32px;margin-left:6px;font-size:12.5px;padding:0 10px;vertical-align:middle}
+td:has(.resetbtn2){white-space:nowrap}
+.badge.hb{margin-left:2px;font-size:12px;min-width:24px;padding:0 8px;line-height:1.6}
+.card3[aria-pressed=true]{box-shadow:inset 0 -3px 0 #8C867C;background:#F5F4F2}
+.badge.xl{font-size:20px;padding:2px 12px;margin:0;line-height:1.4;letter-spacing:-.01em;border-radius:999px}
+.card3 .c-l{margin-top:10px}
+.card3[aria-pressed=true]{box-shadow:inset 0 -3px 0 #DDDBD7;border-color:#DDDBD7;background:#F5F4F2}
+/* users v2 */
+.utool{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.usearch{display:inline-flex;align-items:center;gap:8px;height:34px;width:280px;padding:0 12px;border:1px solid #DDDBD7;border-radius:9px;background:#fff;box-shadow:0 1px 2px rgba(16,16,16,.05);color:var(--muted)}
+.usearch:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.usearch input{border:0;margin:0;padding:0;height:100%;background:transparent;box-shadow:none;font-size:13.5px}
+.usearch input:focus{outline:none}
+.matrix th{white-space:nowrap}
+.matrix th.c,.matrix td.c{width:auto;white-space:nowrap;padding-left:8px;padding-right:8px}
+.matrix td{padding-top:12px;padding-bottom:12px}
+.acell{min-width:0}
+.warnline{color:#7A4E00;font-weight:500}
+.cbx{width:20px;height:20px;border-radius:6px;border:1.5px solid #CFCBC4;background:#fff;display:inline-grid;place-items:center;padding:0;color:#fff;vertical-align:middle;transition:background .12s,border-color .12s}
+.cbx:hover:not(:disabled){border-color:#8C867C}
+.cbx[aria-checked=true]{background:var(--accent);border-color:var(--accent)}
+.cbx:disabled{opacity:.45;cursor:default}
+.totals td{background:#FAFAF9}
+.matrix tr[hidden]{display:none}
+/* right panel: full-width separators, caps headers, collapsible */
+.props{padding:0}
+.psec{padding:0 20px 18px}
+.psec+.psec{margin-top:0;padding-top:0;border-top:1px solid var(--line);margin-left:0;margin-right:0}
+.phead{display:flex;align-items:center;justify-content:space-between;width:calc(100% + 40px);margin:0 -20px;padding:18px 20px 12px;border:0;background:transparent;font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);text-align:left}
+.phead:hover{color:var(--ink)}
+.phead svg{transition:transform .15s;color:var(--muted)}
+.psec.closed .phead{padding-bottom:18px}
+.psec.closed .phead svg{transform:rotate(-90deg)}
+.psec.closed{padding-bottom:0}
+.psec.closed .pbody{display:none}
+.outline{padding:3px 0}
+/* align panel headers with 52px column bars */
+.phead,.psec.closed .phead{height:52px;padding:0 20px;box-sizing:border-box}
+.psec{padding-bottom:16px}
+.psec.closed{padding-bottom:0}
+.psec .pbody{padding-top:4px}
+/* separators as bottom borders so the first line lands exactly where the 52px bars end */
+.psec+.psec{border-top:0}
+.psec{border-bottom:1px solid var(--line)}
+.phead,.psec.closed .phead{height:51px}
+/* shell v2: icon nav, collapsible rail, framed content */
+body{background:#F4F3F1}
+.app{grid-template-columns:232px 1fr;background:#F4F3F1}
+.app.nav-closed{grid-template-columns:60px 1fr}
+.side{background:transparent;border-right:0;padding:10px 10px 12px;overflow-x:hidden}
+.app.nav-closed .side{visibility:visible;padding:10px 8px}
+.logo{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 2px 14px 8px;min-height:44px}
+.logo b{font-size:15.5px;font-weight:650;white-space:nowrap;overflow:hidden}
+.app.nav-closed .logo{justify-content:center;padding:2px 0 14px}
+.app.nav-closed .logo b{display:none}
+.navtoggle{width:32px;height:32px}
+.nav{align-items:center;gap:10px;height:34px;padding:0 9px;font-size:14px;color:var(--ink)}
+.nav .nicon{flex:none}
+.nav .nlabel{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav .ncount{color:var(--faint);font-size:12px}
+.nav:hover{background:#EAE8E4}
+.nav.on{background:#fff;box-shadow:0 0 0 1px #E4E1DB,0 1px 2px rgba(0,0,0,.05);font-weight:500}
+.app.nav-closed .nav{justify-content:center;padding:0;width:44px;margin:0 auto}
+.app.nav-closed .nlabel,.app.nav-closed .ncount{display:none}
+.navh{padding:20px 9px 6px}
+.app.nav-closed .navh{padding:14px 0 8px}
+.app.nav-closed .navh span{display:none}
+.app.nav-closed .navh::after{content:"";display:block;height:1px;background:#E0DDD8;margin:0 8px}
+.mainwrap{margin:8px 8px 8px 0;background:#fff;border:1px solid #E4E1DB;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.pagebar{padding-left:22px}
+@media (max-width:900px){.mainwrap{margin:0;border-radius:0;border:0}}
+.side{padding-top:9px}
+.logo,.app.nav-closed .logo{height:59px;min-height:0;padding:0 2px 0 8px;margin-bottom:10px;align-items:center}
+.app.nav-closed .logo{padding:0}
+.nav,.nav .nlabel,.nav .nicon{color:var(--ink)}
+.nav .ncount{color:var(--muted)}
+.navh{color:var(--muted)}
+.resetbtn3{width:32px;height:32px;margin-left:6px;display:inline-grid;place-items:center;vertical-align:middle;border:0;border-radius:9px;background:#EEECE8;color:#1D1B18}
+.resetbtn3:hover{background:#E4E1DB}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+
+const NOW = 689; // 11:29 AM
+const TYPES = {
+  cmn:{name:"Call me now",p:10,due:"2 min",sub:"Caregiver asked on the website",fixed:true,stats:[0,0,"—",0]},
+  inbound:{name:"Inbound calls",p:10,due:"Live",sub:"Phone",stats:[9,0,"4 min",2]},
+  sms:{name:"SMS queue",p:10,due:"15 min",sub:"Texts from caregivers",stats:[14,0,"12 min",5]},
+  fmco:{name:"First MCO call",p:9,due:"2 h",sub:"Superior, Molina, Amerigroup, Cigna, UHC",stats:[41,9,"2 d",12]},
+  escalation:{name:"Case escalation",p:8,due:"1 d",sub:"5 texts, no reply",stats:[12,6,"5 d",3]},
+  pson:{name:"Provider statement of need",p:6,due:"2 d",sub:"Provider offices",stats:[23,11,"6 d",4]},
+  auth:{name:"Wait on authorization",p:4,due:"5 d",sub:"After the nurse visit",stats:[34,14,"12 d",2]},
+  never:{name:"Never contacted",p:3,due:"1 d",sub:"No attempt since the case was created",stats:[217,217,"31 d",217]}
+};
+const TYPE_ORDER = ["cmn","inbound","sms","fmco","escalation","pson","auth","never"];
+const SOP = {
+  "fmco:Superior":["Call the caregiver first and check they can stay on for a three-way call. Superior won't talk to you alone.","Dial Superior provider services, choose option 3, give the Medicaid number and the patient's date of birth.","Ask for a personal attendant services request and write down the reference number.","If the caregiver isn't the legal representative, Superior ends the call. Release it with a note; a POA task follows."],
+  fmco:["Call the caregiver and check they can stay on for a three-way call.","Dial the MCO member line and ask for a personal attendant services request.","Write the reference number in the call note."],
+  cmn:["Call within 2 minutes. They are expecting it.","Confirm the patient has Medicaid and which MCO they're with.","Go straight into the First MCO call if you can. If not, book a time."],
+  escalation:["Texts haven't landed, so call.","No answer: leave a voicemail and pause until tomorrow.","If they asked to stop texts, turn off automated messages on their number."],
+  pson:["Call the provider office and confirm they received the fax.","Ask for the date they'll send the statement of need.","If it's lost, re-send the fax while you're on the phone."],
+  auth:["Call the MCO and ask for the authorization status.","Write down the reference number and the date they give you.","If it's approved, the next task opens when you close this one."],
+  never:["First contact. Say who Brevy is and why you're calling.","Confirm they still want to be paid as a caregiver.","Book the First MCO call before you hang up."]
+};
+let seq = 0;
+function T(caseId, patient, cg, rel, phone, type, mco, o = {}) {
+  return {key:"k"+(++seq), id:"C-"+caseId, patient, cg, rel, phone, type, mco,
+    due:o.due ?? NOW+120, sched:o.sched ?? null, created:o.created ?? 20260920, note:o.note || "",
+    attempts:(o.pauses||0)+(o.releases||0), pauses:o.pauses||0, releases:o.releases||0, interrupts:0, blockedBy:o.blockedBy||null, lastBy:o.lastBy || null, extras:o.extras || [], phoneNote:o.phoneNote || "",
+    status:o.status || "open", heldBy:o.heldBy || null, heldAt:o.heldBy ? Date.now()-19*60000 : null,
+    pOver:null, assignedTo:null, pausedUntil:null, createdMs:null};
+}
+function seedTasks() {
+  return [
+    T(1402,"Nora Whitfield","Denise Whitfield","daughter","(520) 555-0110","fmco","Superior",{sched:615,due:615,created:20260810,phoneNote:"Nora's landline",note:"Denise asked for afternoons. Nora sleeps in the morning.",extras:["phone","consent"]}),
+    T(1377,"Alonso Reyes","Marta Reyes","wife","(210) 555-0147","fmco","Molina",{sched:630,due:630,created:20260915}),
+    T(1350,"Bernice Tull","Kareem Tull","son","(713) 555-0199","fmco","Cigna",{sched:660,due:660,created:20260912}),
+    T(1431,"Luis Ortega","Ana Ortega","daughter","(956) 555-0121","fmco","Superior",{due:NOW+60,created:20260928,note:"New case from the website this morning"}),
+    T(1433,"Grace Kim","Daniel Kim","son","(832) 555-0164","fmco","Molina",{due:NOW+180,created:20260928}),
+    T(1429,"Tom Hale","Rita Hale","wife","(512) 555-0177","fmco","Superior",{due:NOW+300,created:20260927,pauses:1,lastBy:"Sam K."}),
+    T(1409,"Hector Vela","Lucia Vela","daughter","(915) 555-0133","fmco","Molina",{sched:840,due:840,created:20260926,lastBy:"you"}),
+    T(1411,"Priya Raman","Arun Raman","son","(469) 555-0102","fmco","Superior",{sched:840,due:840,created:20260926}),
+    T(1410,"Carla Diaz","Jose Diaz","husband","(210) 555-0188","fmco","Superior",{status:"held",heldBy:"devon",created:20260925}),
+    T(1204,"Roberto Salas","Elena Salas","daughter","(956) 555-0114","escalation","Molina",{due:NOW-3*1440,created:20260901,note:"5 automated texts, no reply"}),
+    T(1289,"Beatriz Nunez","Carlos Nunez","son","(210) 555-0156","escalation","Molina",{due:NOW+1440,created:20260911,note:"Caregiver asked us to stop texting"}),
+    T(1388,"Marcus Bell","Tanya Bell","wife","(281) 555-0140","pson","Amerigroup",{due:NOW-1440,created:20260908,note:"Provider office hasn't sent it",blockedBy:"Documentation needed: signed POA form"}),
+    T(1422,"Gloria Tran","Minh Tran","son","(713) 555-0109","pson","Amerigroup",{due:NOW+480,created:20260918}),
+    T(1301,"Ana Delgado","Rosa Delgado","sister","(512) 555-0193","auth","UnitedHealthcare",{due:NOW-720,created:20260829,note:"Nurse visit was 12 days ago"}),
+    T(1355,"Frank Okonkwo","Ngozi Okonkwo","wife","(832) 555-0171","auth","Superior",{due:NOW+1440,created:20260902,releases:1,lastBy:"Trina W.",note:"Weekly check-in with the MCO"}),
+    T(1467,"Yolanda Pierce","Darnell Pierce","son","(214) 555-0126","never","Unknown",{due:NOW-3*1440,created:20260925,note:"Created 3 days ago, no attempts"}),
+    T(1398,"Kevin Ng","May Ng","daughter","(972) 555-0158","never","Unknown",{due:NOW-20*1440,created:20260908,note:"Created 20 days ago, no attempts"}),
+    T(1312,"Rosa Mendez","Luis Mendez","son","(915) 555-0185","never","Unknown",{due:NOW-31*1440,created:20260828,note:"Created 31 days ago, no attempts"})
+  ];
+}
+function init() {
+  seq = 0;
+  return {
+    view:"tasks", sel:null, navOpen:true, propsOpen:true, mq:"missed", mfilter:"all", editAgents:false, filter:null, demo:false,
+    types:JSON.parse(JSON.stringify(TYPES)),
+    agents:[
+      {id:"jasmine",name:"Jasmine Okafor",on:true,types:["cmn","fmco","escalation","pson","auth"],yesterday:["cmn","inbound"],worked:6,closed:4},
+      {id:"marcus",name:"Marcus Owens",on:true,types:["cmn","escalation"],yesterday:["cmn","escalation"],worked:5,closed:3,now:"Case escalation, Irene Cole",mins:38},
+      {id:"devon",name:"Devon Adams",on:true,types:["cmn","fmco"],yesterday:["auth"],worked:7,closed:5,now:"First MCO call, Carla Diaz",mins:19},
+      {id:"trina",name:"Trina Walsh",on:true,types:["cmn","fmco","pson"],yesterday:["fmco"],worked:4,closed:2,now:"Nothing held since 10:40 AM"},
+      {id:"sam",name:"Sam Kowalski",on:true,types:["cmn","pson","auth"],yesterday:["inbound"],worked:5,closed:4,now:"Nothing held, 1 paused until 2:30 PM"},
+      {id:"priya",name:"Priya Nair",on:true,types:["inbound"],yesterday:["fmco"],worked:11,closed:9,now:"On an inbound call"},
+      {id:"aisha",name:"Aisha Bello",on:true,types:["sms"],yesterday:["escalation"],worked:23,closed:20,now:"Answering texts"},
+      {id:"leo",name:"Leo Martins",on:false,outUntil:"Out until Fri, Oct 2",types:["fmco"],yesterday:["fmco"],worked:0,closed:0}
+    ],
+    tasks:seedTasks(), held:null, interruptedKey:null, offerBack:null, panel:null, choice:{}, capture:{},
+    err:null, result:null, toast:null, collide:false, onCall:false
+  };
+}
+let S = init();
+
+// helpers
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = m => { const h = Math.floor(m/60), mm = m%60; return `${((h+11)%12)+1}:${String(mm).padStart(2,"0")} ${h>=12?"PM":"AM"}`; };
+const dur = m => m < 60 ? `${m} min` : m < 1440 ? `${Math.round(m/60)} h` : `${Math.round(m/1440)} d`;
+const ml = (...parts) => `<span class="ml">${parts.filter(Boolean).map(p => `<span>${p}</span>`).join("")}</span>`;
+const byKey = k => S.tasks.find(t => t.key === k);
+const agent = id => S.agents.find(a => a.id === id);
+const tname = t => S.types[t]?.name || t;
+const pri = t => t.pOver ?? S.types[t.type]?.p ?? 0;
+const raised = t => t.pOver != null && t.pOver > (S.types[t.type]?.p ?? 0);
+const me = () => agent("jasmine");
+const agentsFor = type => S.agents.filter(a => a.on && a.types.includes(type)).length;
+const checkSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+
+function eligible(t) {
+  if (t.status !== "open" || t.type === "cmn") return false;
+  if (t.assignedTo) return t.assignedTo === "jasmine";
+  if (!me().types.includes(t.type)) return false;
+  return t.sched == null || t.sched - NOW <= 5;
+}
+function grp(t) {
+  if (t.assignedTo === "jasmine") return 0;
+  if (t.sched != null && t.sched <= NOW) return 1;
+  if (t.sched != null) return 2;
+  return 3;
+}
+const BATCH = ["fmco","auth","escalation"]; // Kelsey: grouping by MCO matters for these
+function queue() {
+  const list = S.tasks.filter(eligible).sort((a, b) =>
+    grp(a) - grp(b) ||
+    (grp(a) === 1 ? a.sched - b.sched : 0) ||
+    pri(b) - pri(a) ||
+    a.due - b.due ||
+    b.created - a.created);
+  // keep same-MCO tasks together, only inside a run of equal priority
+  const out = [];
+  let i = 0;
+  while (i < list.length) {
+    if (grp(list[i]) !== 3 || !BATCH.includes(list[i].type)) { out.push(list[i++]); continue; }
+    let j = i; const p = pri(list[i]);
+    while (j < list.length && grp(list[j]) === 3 && pri(list[j]) === p && BATCH.includes(list[j].type)) j++;
+    const run = list.slice(i, j), mcos = [];
+    run.forEach(x => { if (!mcos.includes(x.mco)) mcos.push(x.mco); });
+    mcos.forEach(m => run.filter(x => x.mco === m).forEach(x => out.push(x)));
+    i = j;
+  }
+  return out;
+}
+function reason(t) {
+  if (t.assignedTo === "jasmine") return {text:"Assigned to you by Kelsey", cls:"soon"};
+  if (raised(t)) return {text:`Raised to P${t.pOver} by Kelsey`, cls:"soon"};
+  if (t.sched != null) {
+    if (t.sched <= NOW) return {text:`Missed scheduled call at ${fmt(t.sched)}, ${dur(NOW - t.sched)} late`, cls:"late"};
+    return {text:`Scheduled for ${fmt(t.sched)}, in ${t.sched - NOW} min`, cls:"soon"};
+  }
+  if (t.due < NOW) return {text:`${dur(NOW - t.due)} past due`, cls:"late"};
+  return {text:`Due in ${dur(t.due - NOW)}`, cls:"ok"};
+}
+const attemptTag = t => t.attempts ? `<span class="tag warn">Attempt ${t.attempts + 1}${t.lastBy ? `, last tried by ${esc(t.lastBy)}` : ""}</span>` : "";
+
+// ---------- agent ----------
+const ICONS = {
+  bolt:'<path d="M13 2L4.5 13.5H12L11 22l8.5-11.5H12L13 2z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+  back:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 010 10h-3"/>'
+};
+function alertCard(o) {
+  return `<div class="alert ${o.tone}"${o.role ? ` role="${o.role}"` : ""}>
+    <div class="a-main"><div class="a-head"><span class="a-label">${o.label}</span>${o.pill ? `<span class="a-pill">${o.pill}</span>` : ""}</div>
+      <div class="a-name">${o.name}</div><div class="a-meta">${o.meta.filter(Boolean).map(m => `<span>${esc(m)}</span>`).join("")}</div>
+      ${o.note ? `<div class="a-note">${o.note}</div>` : ""}</div>
+    ${o.action ? `<div class="a-actions">${o.action}</div>` : ""}</div>`;
+}
+
+function urgentTask() { return S.tasks.find(t => t.type === "cmn" && t.status === "open"); }
+const GROUPS = ["Raised for you", "Missed scheduled calls", "Scheduled calls coming up", "Next by priority"];
+function currentSel() {
+  if (S.held) return byKey(S.held);
+  const q = queue();
+  const s = S.sel && byKey(S.sel);
+  return s && eligible(s) ? s : q[0] || null;
+}
+function queueCol() {
+  const q = queue(), sel = currentSel();
+  let h = "";
+  const u = urgentTask();
+  if (u && me().types.includes("cmn")) h += alertCard({tone:"red", icon:"bolt", label:"Call me now", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
+    name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`],
+    note:S.held ? "Claiming puts your current task back in the pool. You get first pick of it after." : "",
+    action:`<button class="btn primary sm" data-act="claim" data-key="${u.key}">Claim</button>`});
+  const soon = S.tasks.find(t => eligible(t) && t.sched != null && t.sched > NOW);
+  if (soon && S.held !== soon.key) h += alertCard({tone:"blue", icon:"clock", label:"Scheduled call", pill:`<span>${fmt(soon.sched)}</span>`,
+    name:esc(soon.cg), meta:[soon.id, soon.mco, soon.lastBy === "you" ? "You worked this case last" : "Booked by the caregiver"],
+    note:S.held ? "Finish your current task to claim it." : "",
+    action:S.held ? "" : `<button class="btn sm" data-act="claim" data-key="${soon.key}">Claim</button>`});
+  const nt = S.notice && byKey(S.notice);
+  if (nt && raised(nt) && eligible(nt) && !S.held) h += alertCard({tone:"blue", icon:"up", label:"Raised by Kelsey", pill:`<span>P${nt.pOver}</span>`,
+    name:esc(nt.patient), meta:[tname(nt.type), nt.id, nt.mco],
+    action:`<button class="btn ghost sm" data-act="dismiss">Dismiss</button><button class="btn sm" data-act="claim" data-key="${nt.key}">Claim</button>`});
+  if (S.offerBack) {
+    const b = byKey(S.offerBack);
+    if (b && b.status === "open" && !S.held) h += alertCard({tone:"orange", icon:"back", label:"Pick up again?",
+      name:esc(b.patient), meta:[tname(b.type), b.id], note:"You were on it before the Call me now. Nobody has taken it.",
+      action:`<button class="btn ghost sm" data-act="skipback">Leave it</button><button class="btn sm" data-act="claim" data-key="${b.key}">Claim</button>`});
+  }
+  const urgentOpen = !!(u && me().types.includes("cmn"));
+  const bar = S.held ? `<div class="qbar"><span class="small">Finish or release this task to claim the next one</span></div>`
+    : urgentOpen ? `<div class="qbar"><span class="small">Call me now comes first. Claim it below.</span></div>`
+    : `<div class="qbar"><button class="btn ${S.result ? "" : "primary"} sm" data-act="next" ${S.held || !q.length ? "disabled" : ""}>Claim next<kbd>N</kbd></button>
+    <span class="small">Priority first, then due time</span></div>`;
+  h = `<div class="qtop">${bar}${h}</div><div class="qscroll">`;
+  if (S.held) {
+    const t = byKey(S.held);
+    h += `<div class="ghead">You're working</div>${qItem(t, "•", true)}`;
+  }
+  if (!q.length) h += `<div class="qempty">Nothing to claim right now. New tasks for your task types show up here as they're created.</div>`;
+  let g = -1;
+  q.forEach((t, i) => {
+    if (grp(t) !== g) { g = grp(t); h += `<div class="ghead">${GROUPS[g]}<span>${q.filter(x => grp(x) === g).length}</span></div>`; }
+    h += qItem(t, i + 1, !S.held && sel && sel.key === t.key);
+  });
+  return h + `</div><div class="hint"><span><kbd aria-label="Up arrow">↑</kbd><kbd aria-label="Down arrow">↓</kbd> move</span><span><kbd>N</kbd> claim next</span><span><kbd>C</kbd> claim selected</span>${S.held ? `<span><kbd>1</kbd>–<kbd>4</kbd> resolve</span>` : ""}</div>`;
+}
+function qItem(t, n, active) {
+  const r = reason(t), mine = S.held === t.key;
+  return `<button class="qitem ${active ? "active" : ""} ${mine ? "mine" : ""}" data-act="sel" data-key="${t.key}">
+    <span class="qn">${n}</span><span class="qbody"><span class="qtitle">${tname(t.type)}</span>
+    <span class="small">${ml(t.id, esc(t.patient), esc(t.mco))}</span>
+    <span class="reason ${mine ? "good" : r.cls}">${mine ? "Claimed by you" : r.text}</span>
+    ${t.attempts && !mine ? `<span class="tag warn">Back in the pool, attempt ${t.attempts + 1}</span>` : ""}${t.blockedBy ? `<span class="tag">Blocked by ${esc(t.blockedBy.split(":")[0])}</span>` : ""}</span></button>`;
+}
+function crumbs(t, right) {
+  return `<div class="crumbs"><span class="small">${ml("Enrollment", "Tasks", t ? t.id : "", t ? tname(t.type) : "")}</span><span class="grow"></span>${right || ""}</div>`;
+}
+function callCard(t, live) {
+  const r = reason(t);
+  const tone = r.cls === "late" ? "red" : t.sched != null ? "orange" : "neutral";
+  const title = t.sched != null ? `Today at ${fmt(t.sched)} CDT` : "Today, no set time";
+  const sub = t.sched != null ? r.text : `${r.text}. Call any time today.`;
+  const f = (l, v) => `<div><dt>${l}</dt><dd>${v}</dd></div>`;
+  return `<div class="cc"><div class="cc-top"><div class="cal ${tone}" aria-hidden="true"><span>SEP</span><b>28</b></div>
+    <div class="cc-title"><b>${title}</b><span class="reason ${r.cls}">${sub}</span></div>
+    ${live ? `<button class="btn ${S.onCall ? "oncall" : "primary"}" data-act="call">${S.onCall ? "On call, hang up" : "Call " + esc(t.cg.split(" ")[0])}</button>` : ""}</div>
+    <dl class="cc-grid">
+      ${f("Caregiver", `${esc(t.cg)} <span class="small">${esc(t.rel)}</span>`)}
+      ${f("Phone", `<span class="mono">${esc(t.phone)}</span>${t.phoneNote ? `<div><span class="tag warn">${esc(t.phoneNote)}</span></div>` : ""}`)}
+      ${f("Patient", esc(t.patient))}
+      ${f("MCO", esc(t.mco))}
+      ${f("Call type", t.sched != null ? "Booked by the caregiver" : "Outbound")}
+    </dl></div>`;
+}
+function sopBlock(t) {
+  const sop = SOP[`${t.type}:${t.mco}`] || SOP[t.type] || [];
+  if (!sop.length) return "";
+  return `<details class="box"${S.sopOpen ? " open" : ""} data-sop><summary>How to handle a ${tname(t.type)}${t.mco !== "Unknown" ? ` with ${esc(t.mco)}` : ""}</summary>
+    <ol>${sop.map(s => `<li>${esc(s)}</li>`).join("")}</ol><div class="small pad">From the Enrollment SOP</div></details>`;
+}
+function timeline(t) {
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const s = String(t.created), cDay = `${MONTHS[+s.slice(4,6) - 1]} ${+s.slice(6,8)}`;
+  const pill = x => `<span class="tl-pill">${esc(x)}</span>`;
+  const ev = [];
+  const today = cDay === "Sep 28" ? "Today" : "Today";
+  if (S.held === t.key) ev.push({day:"Today", time:"11:29 AM", html:`You claimed ${pill(tname(t.type))}`});
+  if (t.pOver != null) ev.push({day:"Today", time:"11:20 AM", html:`Kelsey Anderson set this task to ${pill("P" + t.pOver)}`});
+  if (t.releases) ev.push({day:"Today", time:"9:52 AM", html:`${esc(t.lastBy || "An agent")} released this task back to the pool`, note:"Reason: Waiting on another team"});
+  if (t.pauses) ev.push({day:"Today", time:"9:40 AM", html:`${esc(t.lastBy || "An agent")} paused this task until ${pill("11:00 AM")}`, note:"Reason: No answer"});
+  if (t.extras.includes("phone")) ev.push({day:"Sep 26", time:"2:00 AM", html:`Nightly check flagged ${pill("Caregiver phone")} as missing on ${pill(t.id)}`});
+  if (t.note) ev.push({day:cDay === "Sep 28" ? "Today" : cDay, time:"2:14 PM", html:`Note added to ${pill(t.id)}`, note:t.note});
+  if (t.sched != null) ev.push({day:t.created >= 20260927 ? (t.created === 20260928 ? "Today" : "Sep 27") : "Sep 27", time:"4:05 PM", html:`${esc(t.cg)} booked a call for ${pill("Sep 28, " + fmt(t.sched))} through the website`});
+  ev.push({day:cDay === "Sep 28" ? "Today" : cDay, time:"9:14 AM", html:`Automation opened ${pill(tname(t.type))} on ${pill(t.id)}`});
+  ev.push({day:cDay === "Sep 28" ? "Today" : cDay, time:"9:12 AM", html:`Case ${pill(t.id)} created for ${esc(t.patient)}`});
+  const days = [];
+  const KEY = {"Today":20260928, "Sep 27":20260927, "Sep 26":20260926};
+  ev.forEach(e => { e.k = KEY[e.day] ?? t.created; });
+  ev.sort((a, b) => b.k - a.k);
+  ev.forEach(e => { let d = days.find(x => x.day === e.day); if (!d) days.push(d = {day:e.day, items:[]}); d.items.push(e); });
+  return `<h3 class="sh">Timeline</h3><div class="tl2">${days.map(d => `<div class="tl-day">${d.day}</div>${d.items.map(e => `
+    <div class="tl-ev"><span class="tl-dot" aria-hidden="true"></span><div class="tl-txt">${e.html}${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div><span class="tl-time">${e.time}</span></div>`).join("")}`).join("")}</div>`;
+}
+function blocked(t) { return t.blockedBy ? `<div class="blockbox"><b>Blocked by ${esc(t.blockedBy)}</b><div class="small">You can still work it. It shows here so you know why it may stall.</div></div>` : ""; }
+function preview(t) {
+  const r = reason(t);
+  const blockedByHeld = S.held && t.type !== "cmn";
+  const right = blockedByHeld ? `<span class="small">Finish your current task to claim</span>` : `<button class="btn sm" data-act="claim" data-key="${t.key}">Claim this task<kbd>C</kbd></button>`;
+  return crumbs(t, right) + `<div class="detail"><h1>${tname(t.type)}</h1>
+    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
+    ${t.attempts ? attemptTag(t) : ""}${blocked(t)}
+    <h3 class="sh">Call information</h3>${callCard(t, false)}
+    ${t.extras.length ? `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box pad">
+      <ul class="plain">${t.extras.includes("phone") ? `<li>Caregiver's own phone number is missing</li>` : ""}${t.extras.includes("consent") ? `<li>Texting consent not recorded</li>` : ""}</ul>
+      <div class="small">These come with the task when you claim it.</div></div>` : ""}
+    ${sopBlock(t)}${timeline(t)}</div>`;
+}
+function workspace(t) {
+  const r = reason(t);
+  const hasPhone = (S.capture.phone || "").trim().length > 5, hasConsent = !!S.capture.consent;
+  let h = crumbs(t, `<span class="tag good">Claimed by you</span>`) + `<div class="detail"><h1>${tname(t.type)}</h1>
+    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
+    <p class="small touch">This stays yours while you work it. After 5 minutes with no call, note or field change, it goes back to the pool.</p>${blocked(t)}
+    <h3 class="sh">Call information</h3>${callCard(t, true)}`;
+  if (t.extras.length) {
+    h += `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box capture">`;
+    if (t.extras.includes("phone")) h += `<div><label class="lbl" for="cgphone">${esc(t.cg)}'s own phone number <span class="req ${hasPhone ? "met" : ""}">${hasPhone ? "Added" : "Needed to close"}</span></label>
+      <span class="small">The number on file is ${esc(t.phoneNote || "someone else's")}. Flagged by the nightly check 2 days ago.</span>
+      <input id="cgphone" data-cap="phone" inputmode="tel" placeholder="(520) 555-0134" value="${esc(S.capture.phone || "")}"></div>`;
+    if (t.extras.includes("consent")) h += `<div><span class="lbl">Texting consent <span class="req ${hasConsent ? "met" : ""}">${hasConsent ? "Recorded" : "Needed to close"}</span></span>
+      <span class="small">They didn't opt in on the website. Without it, every update has to be a phone call.</span>
+      <div class="chips"><button class="chip" aria-pressed="${S.capture.consent === "yes"}" data-act="cap" data-k="consent" data-v="yes">Agreed to texts</button>
+      <button class="chip" aria-pressed="${S.capture.consent === "no"}" data-act="cap" data-k="consent" data-v="no">Declined</button></div></div>`;
+    h += `</div>`;
+  }
+  h += sopBlock(t) + `<h3 class="sh">Call note</h3><div class="box">
+    <div class="notef">${NOTE_FIELDS.map(([k, l]) => `<label class="nrow"><span class="nlbl">${l}</span><textarea rows="1" data-cap="${k}" data-grow>${esc(S.capture[k] || "")}</textarea></label>`).join("")}</div>
+    <div class="small pad">Leave blank anything that doesn't apply. Posts to the ${t.id} timeline, tagged to this task.</div></div>
+    <h3 class="sh">Resolution</h3><div class="box pad"><div class="lbl">How did the call go?</div><div class="outcomes">
+    ${[["reached","Reached them",1],["noanswer","No answer",2],["later","Call back later",3],["inelig","Not eligible",4]].map(([v, l, k]) =>
+      `<button class="btn" aria-pressed="${S.panel?.variant === v}" data-act="outcome" data-v="${v}">${l}<kbd>${k}</kbd></button>`).join("")}</div>
+    ${S.err ? `<div class="err" role="alert">${S.err}</div>` : ""}${panel(t)}
+    <div class="resfoot"><button class="btn ghost sm" data-act="panel" data-v="release">Release without finishing</button></div></div>${timeline(t)}</div>`;
+  return h;
+}
+function center() {
+  if (S.held) return workspace(byKey(S.held));
+  if (S.result) {
+    const q = queue();
+    return crumbs(null) + `<div class="detail"><div class="check">${checkSvg}</div><h1 style="margin-top:12px">${esc(S.result.title)}</h1>
+      <ul class="lines">${S.result.lines.map(l => `<li>${l}</li>`).join("")}</ul>
+      ${q.length && !(urgentTask() && me().types.includes("cmn")) ? `<button class="btn primary" data-act="next" style="margin-top:20px">Claim next<kbd>N</kbd></button>` : ""}</div>`;
+  }
+  const t = currentSel();
+  if (!t) return crumbs(null) + `<div class="detail empty"><h1>Nothing to claim</h1><p class="lead">New tasks for your task types show up in the list as soon as they're created.</p></div>`;
+  return preview(t);
+}
+function age(t) { const s = String(t.created), d = new Date(+s.slice(0,4), +s.slice(4,6)-1, +s.slice(6,8)); const n = Math.round((new Date(2026,8,28) - d) / 864e5); return n < 1 ? "Today" : `${n} d`; }
+const pc = id => (S.pc || {})[id] ? "closed" : "";
+const phead = (id, title) => `<button class="phead" data-act="psec" data-v="${id}" aria-expanded="${!(S.pc || {})[id]}"><span>${title}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>`;
+function props() {
+  const t = S.held ? byKey(S.held) : (S.result ? null : currentSel());
+  if (!t) return `<div class="small" style="padding:20px">Select a task to see its details.</div>`;
+  const status = S.held === t.key ? "Claimed by you" : t.status === "open" ? "Open" : t.status;
+  return `<section class="psec ${pc("props")}">${phead("props","Properties")}<div class="pbody"><dl class="pdl">
+    <dt>Type</dt><dd>${tname(t.type)}</dd><dt>Status</dt><dd>${status}</dd>
+    <dt>Due</dt><dd>${t.due < NOW ? `<span class="late">${dur(NOW - t.due)} ago</span>` : `In ${dur(t.due - NOW)}`}</dd>
+    ${t.sched != null ? `<dt>Booked for</dt><dd>${fmt(t.sched)}</dd>` : ""}
+    <dt>Paused</dt><dd>${t.pauses || 0}×</dd><dt>Released</dt><dd>${t.releases || 0}×</dd>${t.blockedBy ? `<dt>Blocked by</dt><dd>${esc(t.blockedBy.split(":")[0])}</dd>` : ""}
+    <dt>Case created</dt><dd>${String(t.created).replace(/(\d{4})(\d{2})(\d{2})/, "$2/$3/$1")}</dd><dt>Age</dt><dd>${age(t)}</dd></dl></div></section>
+    <section class="psec ${pc("case")}">${phead("case","Case details")}<div class="pbody">
+    <div class="plink"><span class="dot" style="background:#8B6CEF"></span>${t.id}</div>
+    <div class="plink"><span class="dot" style="background:#D9534F"></span>${esc(t.patient)}</div>
+    <div class="plink"><span class="dot" style="background:#3B82F6"></span>${esc(t.cg)}</div>
+    <div class="plink"><span class="dot" style="background:#B7892E"></span>${esc(t.mco)}</div></div></section>`;
+}
+function agentPage() {
+  return `<div class="tasks"><aside class="qcol" aria-label="Task queue">${queueCol()}</aside>
+    <section class="center">${center()}</section><aside class="props">${props()}</aside></div>`;
+}
+const PANELS = {
+  noanswer:{kind:"pause",reasons:["No answer","Left voicemail","Wrong number"]},
+  later:{kind:"pause",reasons:["Asked for a later time","Busy, will call back","Checking with family first"]},
+  inelig:{kind:"inelig",reasons:["Medicaid not active","Program doesn't cover attendant care","Moved out of state"]},
+  release:{kind:"release",reasons:["Needs a Spanish speaker","Waiting on another team","Not my kind of task","Can't finish it right now"]}
+};
+const NOTE_FIELDS = [["spoke","Spoke with:"],["outcomeNote","Outcome:"],["nextStep","Next step:"]];
+const WAKE = {"In 1 hour":NOW+60,"2:00 PM":840,"4:00 PM":960,"Tomorrow 9:00 AM":1440+540};
+const TIMES = ["In 1 hour","2:00 PM","4:00 PM","Tomorrow 9:00 AM"];
+function panel(t) {
+  if (!S.panel) return "";
+  const P = PANELS[S.panel.variant], c = S.choice;
+  const chips = (k, arr) => `<div class="chips">${arr.map(v => `<button class="chip" aria-pressed="${c[k] === v}" data-act="choose" data-k="${k}" data-v="${esc(v)}">${esc(v)}</button>`).join("")}</div>`;
+  if (P.kind === "pause") return `<div class="panel"><div class="row"><span class="lbl">Try again</span>${chips("time", TIMES)}</div>
+    <div class="row"><span class="lbl">Why</span>${chips("reason", P.reasons)}</div>
+    <button class="btn primary" data-act="confirm">Pause until ${esc(c.time)}</button>
+    <p class="meta" style="margin:10px 0 0">It leaves every queue until then, then comes back open for whoever's free. This counts as attempt ${t.attempts + 1}.</p></div>`;
+  if (P.kind === "inelig") return `<div class="panel"><div class="row"><span class="lbl">Reason</span>${chips("reason", P.reasons)}</div>
+    <button class="btn primary" data-act="confirm">Close as not eligible</button>
+    <p class="meta" style="margin:10px 0 0">Kelsey decides whether the case is lost.</p></div>`;
+  return `<div class="panel"><div class="row"><span class="lbl">Why are you releasing it?</span>${chips("reason", P.reasons)}</div>
+    <button class="btn primary" data-act="confirm">Release to the pool</button>
+    <p class="meta" style="margin:10px 0 0">Anyone set up for ${tname(t.type)} can take it. Your attempt stays in its history.</p></div>`;
+}
+function nextFor(t) {
+  if (t.type === "fmco") return t.mco === "Superior" ? {name:"Provider statement of need", type:"pson", step:"Waiting on PSON", due:2880, why:"Superior needs one after this call"} : {name:"Schedule nurse visit", type:null, step:"Need to schedule nurse visit"};
+  if (t.type === "cmn" || t.type === "escalation" || t.type === "never") return {name:"First MCO call", type:"fmco", step:"First MCO call", due:120};
+  if (t.type === "pson") return {name:"Schedule nurse visit", type:null, step:"Need to schedule nurse visit"};
+  return {name:"Explanation call", type:null, step:"Explanation call"};
+}
+
+// ---------- actions ----------
+function claim(key) {
+  const t = byKey(key);
+  if (!t || t.status !== "open") { toast("Someone else took that one. It's gone from your queue."); return render(); }
+  let msg = null;
+  if (S.held) {
+    if (t.type !== "cmn") { toast("Finish or release your current task first."); return render(); }
+    const h = byKey(S.held);
+    h.status = "open"; h.heldBy = null; h.heldAt = null;
+    S.interruptedKey = h.key; h.interrupts++;
+    msg = `${h.patient} went back to the pool. You get first pick when you're done.`;
+  }
+  t.status = "held"; t.heldBy = "jasmine"; t.heldAt = Date.now();
+  Object.assign(S, {touched:false, sel:key, held:key, panel:null, choice:{}, capture:{}, err:null, result:null, onCall:false, offerBack:null, sopOpen:false});
+  if (msg) toast(msg);
+  render();
+  topCenter();
+}
+function takeNext() {
+  const q = queue();
+  if (!q.length) return;
+  if (S.collide && q.length > 1) {
+    const lost = q[0];
+    lost.status = "held"; lost.heldBy = "devon"; lost.heldAt = Date.now();
+    Object.assign(agent("devon"), {now:`${tname(lost.type)}, ${lost.patient}`, mins:0});
+    S.collide = false;
+    claim(q[1].key);
+    toast(`Devon took ${lost.patient} a moment before you. You've got the next one: ${q[1].patient}.`);
+    return render();
+  }
+  claim(q[0].key);
+}
+function outcome(v) {
+  S.err = null;
+  if (v === "reached") {
+    const t = byKey(S.held);
+    const miss = t.extras.filter(e => e === "phone" ? (S.capture.phone || "").trim().length < 6 : !S.capture.consent);
+    if (miss.length) { S.err = "Add the caregiver's phone number and texting consent before closing."; S.panel = null; return render(); }
+    return finish("reached");
+  }
+  if (S.panel?.variant === v) { S.panel = null; return render(); }
+  const P = PANELS[v];
+  S.panel = {kind:P.kind, variant:v};
+  S.choice = {reason:P.reasons[0], time:"2:00 PM"};
+  render();
+}
+function finish(kind) {
+  const t = byKey(S.held), a = me();
+  if (kind === "reached") {
+    t.status = "done"; a.worked++; a.closed++;
+    const nx = nextFor(t);
+    if (nx.type) S.tasks.push(Object.assign(T(t.id.slice(2), t.patient, t.cg, t.rel, t.phone, nx.type, t.mco, {due:NOW + nx.due, created:t.created, note:"Opened when the previous task closed"}), {}));
+    const lines = [`${tname(t.type)} closed for ${esc(t.patient)}`, `Next on this case: ${nx.name}${nx.why ? ` (${nx.why})` : ""}, now in the pool`, `Case step updated to ${nx.step}`];
+    if (S.capture.phone) lines.push(`Saved ${esc(t.cg)}'s number: ${esc(S.capture.phone)}`);
+    if (S.capture.consent) lines.push(`Texting consent: ${S.capture.consent === "yes" ? "agreed" : "declined"}`);
+    S.result = {title:"Done", lines};
+  } else if (S.panel.kind === "pause") {
+    Object.assign(t, {status:"paused", pausedUntil:S.choice.time, heldBy:null, lastBy:"Jasmine O.", due:WAKE[S.choice.time]}); t.attempts++; t.pauses++; a.worked++;
+    toast(`Paused until ${S.choice.time}. Then it goes back to the pool.`);
+    S.result = null;
+  } else if (S.panel.kind === "inelig") {
+    t.status = "done"; a.worked++; a.closed++;
+    S.result = {title:"Closed as not eligible", lines:[`${esc(t.patient)}: ${esc(S.choice.reason)}`, "Sent to Kelsey to decide whether the case is lost"]};
+  } else {
+    Object.assign(t, {status:"open", heldBy:null, heldAt:null, lastBy:"Jasmine O."}); t.attempts++; t.releases++;
+    toast(`${t.patient} is back in the pool.`);
+    S.result = null;
+  }
+  S.held = null; S.sel = null; S.panel = null; S.capture = {}; S.onCall = false;
+  if (S.interruptedKey && S.interruptedKey !== t.key) {
+    const b = byKey(S.interruptedKey);
+    if (b && b.status === "open") S.offerBack = b.key;
+  }
+  S.interruptedKey = null;
+  render();
+  topCenter();
+}
+
+// ---------- manager ----------
+const CHEV = `<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+const TICK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+function dd(o) {
+  const open = S.dd === o.id, cur = o.options.find(x => x.v === o.value);
+  return `<span class="dd ${o.small ? "sm" : ""}" data-ddid="${esc(o.id)}"><button type="button" class="fsel ddbtn" data-act="ddopen" data-v="${esc(o.id)}" aria-haspopup="listbox" aria-expanded="${open}"${o.aria ? ` aria-label="${esc(o.aria)}"` : ""}>
+    ${o.label ? `<span class="fl">${o.label}</span>` : ""}<span class="dv ${cur ? "" : "dph"}">${cur ? esc(cur.l) : esc(o.placeholder || "Select")}</span>${CHEV}</button>
+    ${open ? `<div class="apop ddpop" data-align="${o.align || "left"}">${o.search ? `<input type="search" data-ddq placeholder="Search" aria-label="Search" autocomplete="off">` : ""}
+      <div class="aopts" role="listbox">${o.options.map(x => `<button type="button" class="aopt dopt" role="option" aria-selected="${x.v === o.value}" data-act="ddpick" data-dd="${esc(o.id)}" data-v="${esc(x.v)}" data-name="${esc(String(x.l).toLowerCase())}"${x.disabled ? " disabled" : ""}>
+        <span class="drow"><span>${esc(x.l)}</span>${x.v === o.value ? TICK : ""}</span>${x.sub ? `<span class="small">${esc(x.sub)}</span>` : ""}</button>`).join("")}
+      <div class="small anone" hidden style="padding:10px 12px">No match.</div></div></div>` : ""}</span>`;
+}
+function ddPick(id, v) {
+  S.dd = null;
+  const [kind, arg] = id.split(":");
+  if (kind === "assign") { const t = byKey(arg); t.assignedTo = v; toast(`Assigned to ${agent(v).name}. Only they see it now, at the top of their list.`); }
+  if (kind === "sla") { S.types[arg].due = v; toast(`New ${S.types[arg].name} tasks are now due within ${v}.`); }
+  if (kind === "msort") S.msort = v;
+  if (kind === "out") agent(arg).outUntil = v;
+  render();
+}
+function placeDD() {
+  if (!S.dd) return;
+  const wrap = [...document.querySelectorAll("[data-ddid]")].find(e => e.dataset.ddid === S.dd);
+  const pop = wrap && wrap.querySelector(".ddpop"); if (!pop) return;
+  const r = wrap.querySelector(".ddbtn").getBoundingClientRect(), w = Math.max(r.width, 240), h = pop.offsetHeight || 280;
+  let left = pop.dataset.align === "right" ? r.right - w : r.left;
+  left = Math.max(8, Math.min(left, innerWidth - w - 8));
+  const below = innerHeight - r.bottom > h + 12;
+  Object.assign(pop.style, {position:"fixed", width:w + "px", left:left + "px", top:(below ? r.bottom + 6 : r.top - h - 6) + "px"});
+  pop.querySelector("[data-ddq]")?.focus();
+}
+function mgrState(t) {
+  if (t.status === "done") return {text:"Done", cls:"good"};
+  if (t.status === "held") { const a = agent(t.heldBy); return {text:`Claimed by ${a ? a.name.split(" ")[0] : "?"}, ${Math.max(0, Math.round((Date.now() - t.heldAt) / 60000))} min`, cls:"ok"}; }
+  if (t.status === "paused") return {text:`Paused until ${t.pausedUntil}, due moved there`, cls:"ok"};
+  if (t.blockedBy && t.status === "open" && t.pOver == null) return {text:`${t.due < NOW ? dur(NOW - t.due) + " past due, " : ""}blocked`, cls:t.due < NOW ? "late" : "ok"};
+  if (t.assignedTo) return {text:`Assigned to ${agent(t.assignedTo).name.split(" ")[0]}`, cls:"soon"};
+  if (t.sched != null && t.sched <= NOW) return {text:`Booked ${fmt(t.sched)}, ${dur(NOW - t.sched)} late`, cls:"late"};
+  if (t.sched != null) return {text:`Booked ${fmt(t.sched)}`, cls:"ok"};
+  if (t.due < NOW) return {text:`${dur(NOW - t.due)} past due`, cls:"late"};
+  return {text:`Due in ${dur(t.due - NOW)}`, cls:"ok"};
+}
+const missed = () => S.tasks.filter(t => t.sched != null && t.sched <= NOW && t.status !== "done" && t.status !== "paused");
+const toMin = s => { const n = parseFloat(s) || 0; return /d/.test(s) ? n * 1440 : /h/.test(s) ? n * 60 : /min/.test(s) ? n : 0; };
+const SLAS = ["2 min","15 min","1 h","2 h","4 h","1 d","2 d","5 d"];
+const SHORT = {cmn:"Call me now", inbound:"Inbound", sms:"SMS", fmco:"First MCO", escalation:"Escalation", pson:"PSON", auth:"Auth", never:"Never contacted"};
+const mins = t => Math.max(0, Math.round((Date.now() - t.heldAt) / 60000));
+
+function mqList() {
+  const u = urgentTask(), m = missed().length, nNever = agentsFor("never");
+  const row = (id, label, sub, count, cls = "", tone = "neutral") => `<button class="qitem mq ${S.mq === id ? "active" : ""}" data-act="mq" data-v="${id}">
+    <span class="qbody"><span class="qtitle">${label}</span><span class="small ${cls}">${sub}</span></span><span class="badge ${tone}">${count}</span></button>`;
+  let h = "";
+  if (u) h += alertCard({tone:"red", icon:"bolt", label:"Call me now, nobody has claimed it", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
+    name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`]});
+  h += `<div class="ghead">Needs attention</div>`;
+  h += row("missed", "Missed scheduled calls", m ? "A caregiver booked a time, nobody called" : "Every booked call was made", m, m ? "late" : "", m ? "red" : "green");
+  h += row("never", "Never contacted", nNever ? `${nNever} agent${nNever > 1 ? "s" : ""} on it` : "Nobody works this queue", 217, nNever ? "" : "late", "red");
+  h += row("pastdue", "Past due", "All task types, oldest first", 40, "", "amber");
+  h += `<div class="ghead">Task types<span>by priority</span></div>`;
+  [...TYPE_ORDER].filter(k => k !== "never").sort((a, b) => S.types[b].p - S.types[a].p).forEach(k => {
+    const ty = S.types[k], [o, p] = ty.stats;
+    h += row(k, ty.name, `${ty.fixed ? "Always first" : "Priority P" + ty.p}${p ? ` <span class="badge red xs">${p} past due</span>` : ""}`, o || "0", "", o ? "neutral" : "muted");
+  });
+  return h;
+}
+function taskTable(rows, foot) {
+  const opts = S.agents.filter(a => a.on).map(a => `<option value="${a.id}">${a.name}</option>`).join("");
+  return `<div class="table-wrap"><table><thead><tr><th>Case</th><th>Attempts</th><th>Priority</th><th class="right">Assign</th></tr></thead><tbody>
+    ${rows.length ? rows.map(t => { const s = mgrState(t); return `<tr>
+      <td class="casecell"><div class="qtitle">${esc(t.patient)}</div><div class="small">${ml(t.id, esc(t.mco), S.types[S.mq] ? "" : SHORT[t.type])}</div><div class="reason ${s.cls}">${s.text}</div></td>
+      <td class="small">${t.pauses || t.releases ? [t.pauses ? `${t.pauses} paused` : "", t.releases ? `${t.releases} released` : ""].filter(Boolean).join("<br>") : "None yet"}</td>
+      <td>${t.status === "open" && !t.assignedTo && !S.types[t.type].fixed ? `<span class="stepper sm ${t.pOver != null ? "over" : ""}"><button data-act="tpri" data-key="${t.key}" data-v="-1" aria-label="Lower priority for ${esc(t.patient)}">−</button><b>P${pri(t)}</b><button data-act="tpri" data-key="${t.key}" data-v="1" aria-label="Raise priority for ${esc(t.patient)}">+</button></span>${t.pOver != null ? `<button class="resetbtn3" data-act="tpreset" data-key="${t.key}" title="Reset to P${S.types[t.type].p}, the type's priority" aria-label="Reset ${esc(t.patient)} to P${S.types[t.type].p}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>` : ""}` : `<span class="small">P${pri(t)}</span>`}</td>
+      <td class="right">${t.status === "open" && !t.assignedTo ? `
+        ${dd({id:`assign:${t.key}`, placeholder:"Assign to…", aria:`Assign ${t.patient} to`, search:true, options:S.agents.filter(a => a.on).map(a => ({v:a.id, l:a.name, sub:a.types.map(x => SHORT[x]).join(", ")}))})}` : ""}</td></tr>`; }).join("")
+      : `<tr><td colspan="4" class="small" style="padding:24px 14px">Nothing here right now.</td></tr>`}
+    </tbody></table></div>${foot ? `<div class="small">${foot}</div>` : ""}`;
+}
+function viewCenter(title, lead, rows, foot) {
+  return `<div class="crumbs"><span class="small">${ml("Queues", title)}</span></div><div class="detail wide">
+    <h1>${title}</h1><p class="lead">${lead}</p>${taskTable(rows, foot)}</div>`;
+}
+function typeCenter(k) {
+  const ty = S.types[k], [o, p, old, nw] = ty.stats;
+  const mc = S.tasks.filter(t => t.type === k && t.sched != null && t.sched <= NOW && t.status !== "done").length;
+  const workers = S.agents.filter(a => a.on && a.types.includes(k));
+  let rows = S.tasks.filter(t => t.type === k && t.status !== "done");
+  const f = S.mfilter;
+  if (f === "pastdue") rows = rows.filter(t => t.due < NOW && t.sched == null);
+  if (f === "missed") rows = rows.filter(t => t.sched != null && t.sched <= NOW);
+  if (f === "never") rows = rows.filter(t => !t.attempts);
+  rows.sort((a, b) => (S.msort === "oldest" || f === "oldest") ? a.created - b.created : a.due - b.due);
+  const stepper = ty.fixed ? `<span class="small">Always first</span>` : `<span class="stepper labeled"><span class="fl">Priority</span><button data-act="pri" data-k="${k}" data-v="-1" aria-label="Lower priority">−</button><b>P${ty.p}</b><button data-act="pri" data-k="${k}" data-v="1" aria-label="Raise priority">+</button></span>`;
+
+  const dueSel = k === "inbound" ? `<span class="small">Due within: live</span>` : dd({id:`sla:${k}`, label:"Due within", value:ty.due, options:SLAS.map(s => ({v:s, l:s}))});
+  return `<div class="crumbs"><span class="small">${ml("Queues", ty.name)}</span><span class="grow"></span>${dueSel}<span class="vsep"></span>${stepper}</div>
+  <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every free agent the moment it arrives." : "Raising the priority lifts it in every eligible agent's list at once."}</p>
+    <h3 class="sh">Who works this queue <span class="badge ${workers.length ? "neutral" : "red"} hb">${workers.length}</span></h3>
+    ${workers.length ? "" : `<div class="empty-line late" style="margin-bottom:10px">Nobody works this queue. These tasks won't reach anyone until you add an agent.</div>`}
+    <div class="tokens">${workers.map(a => `<span class="token">${a.name}<button data-act="ttype" data-a="${a.id}" data-k="${k}" aria-label="Remove ${a.name} from ${ty.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>`).join("")}
+      <span class="apick"><button class="btn sm" data-act="agentpick" aria-expanded="${!!S.agentPick}">+ Add agent</button>
+      ${S.agentPick ? `<div class="apop" role="dialog" aria-label="Add agent"><input type="search" data-agentq placeholder="Search agents" aria-label="Search agents" autocomplete="off">
+        <div class="aopts">${S.agents.filter(a => !a.types.includes(k)).sort((x, y) => (y.on - x.on) || x.name.localeCompare(y.name)).map(a =>
+          `<button class="aopt" data-act="addagent" data-a="${a.id}" data-k="${k}" data-name="${a.name.toLowerCase()}"${a.on ? "" : " disabled"}><span>${a.name}</span><span class="small">${a.on ? a.types.map(x => SHORT[x]).join(", ") || "Nothing assigned" : "Out"}</span></button>`).join("") || `<div class="small" style="padding:10px 12px">Everyone already works this queue.</div>`}
+        <div class="small anone" hidden style="padding:10px 12px">No agent matches.</div></div></div>` : ""}</span></div>
+    <h3 class="sh">Tasks</h3>
+    <div class="cards">${[["all","Open",o,"neutral",""],["pastdue","Past due",p,"red",o ? Math.round(p / o * 100) + "% of open" : ""],["missed","Missed call",mc,"red",""],["never","Never worked",nw,"amber",o && nw ? Math.round(nw / o * 100) + "% of open" : ""],["oldest","Oldest",old,toMin(old) > toMin(ty.due) ? "red" : "neutral","Target " + ty.due]].map(([v, l, n, tone, sub]) => {
+      const zero = !n || n === "—";
+      return `<button class="card3 ${zero ? "zero" : tone}" aria-pressed="${f === v}" data-act="mfilter" data-v="${v}"><span class="badge xl ${zero ? "muted" : tone}">${zero ? 0 : n}</span><span class="c-l">${l}</span><span class="c-s">${sub && !zero ? sub : v === "all" ? "In this queue" : zero ? "None right now" : ""}</span></button>`; }).join("")}</div>
+    <div class="tabsbar plain"><span class="small">${{all:"All open tasks",pastdue:"Past due",missed:"Missed scheduled calls",never:"Never worked",oldest:"Oldest first"}[f]}</span>
+      ${dd({id:"msort", label:"Sort", value:(S.msort === "oldest" || f === "oldest") ? "oldest" : "due", options:[{v:"due", l:"Due soonest"}, {v:"oldest", l:"Oldest first"}], align:"right"})}</div>
+    ${taskTable(rows, rows.length && o > rows.length ? `Showing ${rows.length} of ${o} in this prototype` : "")}</div>`;
+}
+function liveCol() {
+  const typeView = S.types[S.mq] != null;
+  const viewTypes = typeView ? [S.mq] : [...new Set((S.mq === "missed" ? missed() : S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null)).map(t => t.type))];
+  const scoped = S.liveScope !== "all";
+  const pool = S.agents.filter(a => !scoped || a.types.some(x => viewTypes.includes(x)));
+  const info = a => {
+    if (a.id === "jasmine") { const t = S.held && byKey(S.held); return t ? {txt:`${SHORT[t.type]}, ${esc(t.patient)}`, m:mins(t)} : {txt:"Nothing claimed"}; }
+    return a.mins != null ? {txt:esc(a.now), m:a.mins} : {txt:esc(a.now)};
+  };
+  const rank = a => { const i = info(a); if (i.m >= 30) return 0; if (i.m == null && /nothing/i.test(i.txt)) return 1; return 2; };
+  const on = pool.filter(a => a.on).sort((x, y) => rank(x) - rank(y) || x.name.localeCompare(y.name));
+  const off = pool.filter(a => !a.on);
+  const seg = `<div class="seg2 live-seg" role="group" aria-label="Whose activity to show">
+    <button aria-pressed="${scoped}" data-act="livescope" data-v="queue">This queue</button><button aria-pressed="${!scoped}" data-act="livescope" data-v="all">Everyone</button></div>`;
+  return `<section class="psec ${pc("live")}">${phead("live","Right now")}<div class="pbody">${seg}
+    ${on.length ? on.map(a => { const l = info(a), r = rank(a); return `<div class="live">
+      <div class="hname">${a.name}${r === 0 ? ` <span class="tag warn">Held a while</span>` : r === 1 ? ` <span class="tag">Free</span>` : ""}</div>
+      <div class="small">${l.txt}${l.m != null ? `, ${l.m} min` : ""}</div></div>`; }).join("")
+      : `<div class="small" style="padding:8px 0">Nobody working today is set up for this.</div>`}</div></section>
+    ${off.length ? `<section class="psec ${pc("out")}">${phead("out","Out")}<div class="pbody">${off.map(a => `<div class="small outline">${a.name}, ${(a.outUntil || "Out today").replace("Out ", "").replace("today", "today only")}</div>`).join("")}</div></section>` : ""}`;
+}
+function queuesPage() {
+  const c = S.mq === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
+    : S.mq === "pastdue" ? viewCenter("Past due", "Across all task types, oldest first.", S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null).sort((a, b) => a.due - b.due), "Showing a sample of 40")
+    : typeCenter(S.mq);
+  return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">Needs attention first, then by priority</span></div><div class="qscroll">${mqList()}</div></aside>
+    <section class="center">${c}</section><aside class="props">${liveCol()}</aside></div>`;
+}
+function usersPage() {
+  const same = (a, b) => a.length === b.length && a.every(x => b.includes(x));
+  const tick = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+  return `<div class="mgr">
+  <div class="utool"><label class="usearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input type="search" data-usearch placeholder="Search agents" aria-label="Search agents" autocomplete="off"></label>
+    <span class="small">Tick what each person works today. They only see those task types.</span></div>
+  <div class="table-wrap"><table class="matrix"><thead><tr><th>Agent</th>${TYPE_ORDER.map(k => `<th class="c">${SHORT[k]}</th>`).join("")}<th class="num">Worked</th><th class="num">Closed</th></tr></thead><tbody>
+  ${S.agents.map(a => {
+    const warn = !a.on ? "" : a.types.includes("inbound") && a.yesterday.includes("inbound") ? "On inbound yesterday too" : same(a.types, a.yesterday) && a.types.length > 1 ? "Same work as yesterday" : "";
+    return `<tr class="${a.on ? "" : "off"}" data-uname="${a.name.toLowerCase()}"><td><div class="agent"><button class="toggle" aria-pressed="${a.on}" aria-label="${a.name} working today" data-act="onoff" data-a="${a.id}"></button>
+      <div class="acell"><div class="qtitle">${a.name}</div>${a.on ? `<div class="small">${warn ? `<span class="warnline">${warn}</span>` : "Working"}</div>` : dd({id:`out:${a.id}`, value:a.outUntil || "Out today", small:true, options:["Out today","Out until Fri, Oct 2","Out until Mon, Oct 12"].map(o => ({v:o, l:o}))})}</div></div></td>
+      ${TYPE_ORDER.map(k => `<td class="c"><button class="cbx" role="checkbox" aria-checked="${a.types.includes(k)}" data-act="ttype" data-a="${a.id}" data-k="${k}" ${a.on ? "" : "disabled"} aria-label="${a.name} works ${S.types[k].name}">${a.types.includes(k) ? tick : ""}</button></td>`).join("")}
+      <td class="num">${a.worked}</td><td class="num">${a.closed}</td></tr>`;
+  }).join("")}
+  <tr class="nomatch" hidden><td colspan="${TYPE_ORDER.length + 3}" class="small" style="padding:20px 14px">No agent matches.</td></tr>
+  <tr class="totals"><td class="small">Agents on each</td>${TYPE_ORDER.map(k => { const n = agentsFor(k); return `<td class="c"><span class="badge ${n ? "neutral" : "red"} hb">${n}</span></td>`; }).join("")}<td></td><td></td></tr>
+  </tbody></table></div></div>`;
+}
+// ---------- shell ----------
+let toastTimer;
+function toast(msg) { S.toast = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; render(); }, 5000); }
+function topCenter() { const c = document.querySelector(".center"); if (c) c.scrollTop = 0; }
+const NAV = [["search","Search","⌘K"],["tasks","My Tasks"],["all","All Tasks"],["cases","Cases"],["patients","Patients"],["caregivers","Caregivers"]];
+const NAVI = {
+  search:['','<circle cx="11" cy="11" r="7.5"/><path d="M21 21l-4.5-4.5"/>'],
+  tasks:['','<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/>'],
+  all:['','<path d="M3 6.5l2 2 3.5-3.5"/><path d="M3 16.5l2 2 3.5-3.5"/><path d="M12 7h9M12 12h9M12 17h9"/>'],
+  cases:['','<path d="M20 20a2 2 0 002-2V8a2 2 0 00-2-2h-7.9a2 2 0 01-1.7-.9L9.6 3.9A2 2 0 007.9 3H4a2 2 0 00-2 2v13a2 2 0 002 2z"/>'],
+  patients:['','<circle cx="12" cy="8" r="4.5"/><path d="M20 21a8 8 0 00-16 0"/>'],
+  caregivers:['','<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0016.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4 3 5.5l7 7z"/>'],
+  queues:['','<path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>'],
+  users:['','<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>']
+};
+const navIcon = id => `<svg class="nicon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[id][1]}</svg>`;
+function render() {
+  const agentSide = !["queues","users"].includes(S.view);
+  const q = queue();
+  const nav = (id, label, extra) => `<button class="nav ${S.view === id ? "on" : ""}" data-act="nav" data-v="${id}" title="${label}" aria-label="${label}">${navIcon(id)}<span class="nlabel">${label}</span><span class="ncount">${extra ?? ""}</span></button>`;
+  const title = {tasks:"My Tasks", queues:"Queues", users:"Users", all:"All Tasks", cases:"Cases", patients:"Patients", caregivers:"Caregivers"}[S.view];
+  const who = agentSide ? "Jasmine Okafor, Enrollment" : "Kelsey Anderson, Enrollment manager";
+  const center = S.view === "tasks" ? agentPage() : S.view === "queues" ? queuesPage() : S.view === "users" ? usersPage()
+    : `<div class="placeholder"><p class="lead">${title} works as it does in MC today. It's here so you can see the Call me now alert follow the agent anywhere in the product.</p></div>`;
+  const u = urgentTask();
+  const float = u && agentSide && S.view !== "tasks" && me().types.includes("cmn") ? `<div class="floatcard">${alertCard({tone:"red", icon:"bolt", label:"Call me now", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
+    name:esc(u.cg), meta:[u.id, u.mco, "First to claim gets it"], action:`<button class="btn primary sm" data-act="claimgo" data-key="${u.key}">Claim and open</button>`})}</div>` : "";
+  const alerts = missed().length + (agentsFor("never") ? 0 : 1);
+  const hasProps = S.view === "tasks" || S.view === "queues";
+  const ic = d => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/>${d}</svg>`;
+  document.getElementById("app").innerHTML = `<div class="app ${S.navOpen ? "" : "nav-closed"}">
+    <nav class="side" aria-label="Main"><div class="logo"><b>Mission Control</b><button class="iconbtn navtoggle" data-act="togglenav" aria-label="${S.navOpen ? "Collapse" : "Expand"} navigation" title="${S.navOpen ? "Collapse" : "Expand"} navigation"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/>${S.navOpen ? '<path d="M15.5 10l-2 2 2 2"/>' : '<path d="M13.5 10l2 2-2 2"/>'}</svg></button></div>
+      ${NAV.map(([id, l, x]) => nav(id, l, id === "tasks" ? q.length + (S.held ? 1 : 0) : x)).join("")}
+      <div class="navh"><span>Manage</span></div>${nav("queues", "Queues", alerts || "")}${nav("users", "Users")}</nav>
+    <div class="mainwrap"><header class="pagebar"><h1>${title}</h1>
+      ${S.view === "tasks" ? `<span class="pill">${q.length} to claim</span>` : ""}<span class="grow"></span><span class="small">${who}</span>${hasProps ? `<button class="iconbtn navtoggle" data-act="toggleprops" aria-label="${S.propsOpen ? "Collapse" : "Expand"} details panel" title="${S.propsOpen ? "Collapse" : "Expand"} details panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M15 4v16"/>${S.propsOpen ? '<path d="M8.5 10l2 2-2 2"/>' : '<path d="M10.5 10l-2 2 2 2"/>'}</svg></button>` : ""}</header>
+      <div class="body ${S.propsOpen ? "" : "props-closed"}">${center}</div></div></div>
+    <div class="switcher" role="group" aria-label="Prototype controls">
+      <button aria-pressed="${agentSide}" data-act="nav" data-v="tasks">Agent view</button>
+      <button aria-pressed="${!agentSide}" data-act="nav" data-v="queues">Manager view</button>
+      <span class="sep"></span>
+      <div class="demo"><button data-act="demo" aria-expanded="${S.demo}">Demo scenarios</button>
+      ${S.demo ? `<div class="pop">
+        <button data-act="sc" data-v="cmn">A caregiver asks to be called now<small>Urgent task with a 2-minute countdown</small></button>
+        <button data-act="sc" data-v="heads">A scheduled call is 5 minutes away<small>Heads-up before the booked time</small></button>
+        <button data-act="sc" data-v="collide">Two agents claim the same task<small>Devon wins your next Claim next</small></button>
+        <button data-act="sc" data-v="idle">Jasmine goes quiet for 5 minutes<small>Untouched claimed task returns to the pool</small></button>
+        <button data-act="sc" data-v="wake">Paused tasks wake up<small>They come back open, for anyone</small></button>
+        <hr><button data-act="sc" data-v="reset">Start over<small>Resets all data</small></button></div>` : ""}</div></div>
+    ${float}${S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ""}`;
+  tick();
+  growAll();
+  if (S.agentPick) document.querySelector("[data-agentq]")?.focus();
+  placeDD();
+}
+function growAll() { document.querySelectorAll("[data-grow]").forEach(grow); }
+function tick() {
+  document.querySelectorAll("[data-cd]").forEach(el => {
+    const rem = 120 - Math.floor((Date.now() - +el.dataset.cd) / 1000);
+    const f = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    el.textContent = rem >= 0 ? f(rem) : `Late ${f(-rem)}`;
+  });
+}
+setInterval(tick, 1000);
+function moveSel(d) {
+  const q = queue(); if (!q.length || S.held) return;
+  const cur = currentSel(); let i = q.findIndex(t => t.key === cur?.key);
+  i = Math.max(0, Math.min(q.length - 1, i + d));
+  S.sel = q[i].key; S.result = null; render();
+  document.querySelector(".qitem.active")?.scrollIntoView({block:"nearest"});
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b) {
+    if (S.demo && !e.target.closest(".pop")) { S.demo = false; render(); }
+    else if (S.agentPick && !e.target.closest(".apick")) { S.agentPick = false; render(); }
+    else if (S.dd && !e.target.closest(".dd")) { S.dd = null; render(); }
+    return;
+  }
+  if (S.agentPick && !b.closest(".apick") && b.dataset.act !== "agentpick") S.agentPick = false;
+  if (S.dd && !b.closest(".dd")) S.dd = null;
+  const {act, v, key, k, a} = b.dataset;
+  if (b.tagName === "SELECT") return;
+  if (b.type === "checkbox") { const ag = agent(b.dataset.a); ag.types = b.checked ? [...ag.types, b.dataset.k] : ag.types.filter(x => x !== b.dataset.k); return render(); }
+  if (act !== "demo" && act !== "sc") S.demo = false;
+  switch (act) {
+    case "nav":
+      if (v === "search") toast("Search isn't part of this prototype."); else S.view = v;
+      break;
+    case "demo": S.demo = !S.demo; break;
+    case "sc":
+      S.demo = false;
+      if (v === "reset") { S = init(); break; }
+      if (v === "cmn" && !urgentTask()) S.tasks.push(Object.assign(T(1488, "Walter Marsh", "Delia Marsh", "daughter", "(512) 555-0182", "cmn", "Molina", {due:NOW + 2, created:20260928, note:"Asked to be called now from the website"}), {createdMs:Date.now()}));
+      if (v === "heads") { const h = S.tasks.find(t => t.patient === "Hector Vela"); if (h.status === "open") { h.sched = NOW + 5; h.due = h.sched; } }
+      if (v === "idle") {
+        if (!S.held) { toast("Claim a task first, then try this."); break; }
+        const t = byKey(S.held);
+        if (S.touched) { toast(`You've been working ${t.patient} (call, note or field change), so it stays yours.`); break; }
+        Object.assign(t, {status:"open", heldBy:null, heldAt:null}); S.held = null; S.sel = null; S.panel = null; S.capture = {};
+        toast(`No activity for 5 minutes. ${t.patient} went back to the pool.`);
+      }
+      if (v === "wake") {
+        const p = S.tasks.filter(t => t.status === "paused");
+        if (!p.length) { toast("Nothing is paused. Pause a task first (No answer or Call back later)."); break; }
+        p.forEach(t => { t.status = "open"; t.pausedUntil = null; });
+        toast(`${p.length} paused task${p.length > 1 ? "s are" : " is"} back in the pool, open to anyone, with the attempt count kept.`);
+      }
+      if (v === "collide") { S.collide = true; toast("Next time you press Claim next, Devon claims that task a moment before you."); }
+      break;
+    case "sel": if (!S.held) { S.sel = key; S.result = null; } else if (key !== S.held) toast("Finish or release your current task first."); break;
+    case "next": return takeNext();
+    case "claim": return claim(key);
+    case "togglenav": S.navOpen = !S.navOpen; break;
+    case "toggleprops": S.propsOpen = !S.propsOpen; break;
+    case "claimgo": S.view = "tasks"; return claim(key);
+    case "skipback": S.offerBack = null; break;
+    case "dismiss": S.notice = null; break;
+    case "call": S.onCall = !S.onCall; S.touched = true; break;
+    case "cap": S.capture[k] = v; S.err = null; S.touched = true; break;
+    case "outcome": return outcome(v);
+    case "panel": S.err = null; if (S.panel?.variant === v) { S.panel = null; break; } S.panel = {kind:"release", variant:"release"}; S.choice = {reason:PANELS.release.reasons[0]}; break;
+    case "choose": S.choice[k] = v; break;
+    case "confirm": return finish();
+    case "mq": S.mq = v === "never" ? "never" : v; S.mfilter = "all"; S.agentPick = false; break;
+    case "mfilter": S.mfilter = v; break;
+    case "psec": S.pc = S.pc || {}; S.pc[v] = !S.pc[v]; break;
+    case "livescope": S.liveScope = v; break;
+    case "ddopen": S.dd = S.dd === v ? null : v; S.agentPick = false; break;
+    case "ddpick": return ddPick(b.dataset.dd, v);
+    case "agentpick": S.dd = null; S.agentPick = !S.agentPick; break;
+    case "addagent": { const ag = agent(a); if (!ag.types.includes(k)) ag.types = [...ag.types, k]; S.agentPick = false; toast(`${ag.name} now works ${tname(k)}.`); break; }
+    case "pri": { const ty = S.types[k]; ty.p = Math.min(10, Math.max(1, ty.p + +v)); break; }
+    case "tpri": {
+      const t = byKey(key), base = S.types[t.type].p, before = pri(t);
+      const n = Math.min(10, Math.max(1, before + +v));
+      t.pOver = n === base ? null : n;
+      if (n > before && raised(t)) { S.notice = t.key; toast(`${t.patient} is now P${n}. Agents who work ${tname(t.type)} get a notification.`); }
+      else if (!raised(t) && S.notice === t.key) S.notice = null;
+      break;
+    }
+    case "tpreset": { const t = byKey(key); t.pOver = null; if (S.notice === t.key) S.notice = null; break; }
+    case "onoff": { const ag = agent(a); ag.on = !ag.on; break; }
+    case "ttype": { const ag = agent(a); ag.types = ag.types.includes(k) ? ag.types.filter(x => x !== k) : [...ag.types, k]; break; }
+  }
+  render();
+});
+document.addEventListener("change", e => {
+  const s = e.target;
+  if (s.dataset.act === "msort") { S.msort = s.value; return render(); }
+  if (s.dataset.act === "sla") { S.types[s.dataset.k].due = s.value; toast(`New ${S.types[s.dataset.k].name} tasks are now due within ${s.value}.`); return render(); }
+  if (s.dataset.act === "outuntil") { agent(s.dataset.a).outUntil = s.value; return render(); }
+  if (s.dataset.act === "assign" && s.value) {
+    const t = byKey(s.dataset.key); t.assignedTo = s.value;
+    toast(`Assigned to ${agent(s.value).name}. Only they see it now, at the top of their list.`);
+    render();
+  }
+});
+function grow(el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
+document.addEventListener("input", e => {
+  if (e.target.matches("[data-usearch]")) {
+    const q = e.target.value.trim().toLowerCase(); let n = 0;
+    document.querySelectorAll("tr[data-uname]").forEach(r => { const m = r.dataset.uname.includes(q); r.hidden = !m; if (m) n++; });
+    const nm = document.querySelector("tr.nomatch"); if (nm) nm.hidden = n > 0;
+    return;
+  }
+  if (e.target.matches("[data-ddq]")) {
+    const q = e.target.value.trim().toLowerCase(), pop = e.target.closest(".ddpop"); let n = 0;
+    pop.querySelectorAll(".dopt").forEach(o => { const m = o.dataset.name.includes(q); o.hidden = !m; if (m) n++; });
+    pop.querySelector(".anone").hidden = n > 0;
+    return;
+  }
+  if (e.target.matches("[data-agentq]")) {
+    const q = e.target.value.trim().toLowerCase(); let n = 0;
+    document.querySelectorAll(".aopt").forEach(o => { const m = o.dataset.name.includes(q); o.hidden = !m; if (m) n++; });
+    const none = document.querySelector(".anone"); if (none) none.hidden = n > 0;
+    return;
+  }
+  if (e.target.matches("[data-grow]")) grow(e.target); const k = e.target.dataset.cap; if (k) { S.capture[k] = e.target.value; S.touched = true; } });
+document.addEventListener("toggle", e => { if (e.target.matches("[data-sop]")) S.sopOpen = e.target.open; }, true);
+document.addEventListener("scroll", e => { if (S.dd && !(e.target.closest && e.target.closest(".ddpop"))) { S.dd = null; render(); } }, true);
+addEventListener("resize", () => { if (S.dd) { S.dd = null; render(); } });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && (S.agentPick || S.dd)) { S.agentPick = false; S.dd = null; render(); return; }
+  if (e.target.closest("input,textarea,select") || e.metaKey || e.ctrlKey || e.altKey || S.view !== "tasks") return;
+  const key = e.key.toLowerCase();
+  if (key === "n" && !S.held && !(urgentTask() && me().types.includes("cmn"))) { e.preventDefault(); takeNext(); }
+  else if (key === "c" && !S.held) { const t = currentSel(); if (t) { e.preventDefault(); claim(t.key); } }
+  else if (key === "j" || e.key === "ArrowDown") { e.preventDefault(); moveSel(1); }
+  else if (key === "k" || e.key === "ArrowUp") { e.preventDefault(); moveSel(-1); }
+  else if (S.held && ["1","2","3","4"].includes(e.key)) { e.preventDefault(); outcome(["reached","noanswer","later","inelig"][+e.key - 1]); }
+});
+render();
+</script>
+</body>
+</html>
