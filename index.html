@@ -720,6 +720,34 @@ body{background:#F4F3F1}
 .otherpage .small{margin:0 0 10px}
 .skel{display:block;height:10px;border-radius:5px;background:#EEECE8;max-width:100%}
 .floatcard{top:calc(76px + env(safe-area-inset-top,0px));right:24px}
+/* tidy queue list */
+.mqrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:8px;width:100%;height:48px;padding:0 14px 0 10px;border:0;border-bottom:1px solid var(--line);border-left:3px solid transparent;background:#fff;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.mqrow:hover{background:#FAFAF9}
+.mqrow.active{background:#EFEEEB;border-left-color:var(--accent)}
+.mqrow.active .rank{background:var(--ink);border-color:var(--ink);color:#fff}
+.mqrow.fixed{cursor:default;background:#FAFAF9}
+.mq-lead{display:flex;align-items:center;gap:8px}
+.mq-lead.att{justify-content:center;color:var(--red)}
+.mq-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mq-meta{display:flex;align-items:center;gap:8px}
+.mq-meta .small{white-space:nowrap}
+.mq-late{font-size:12px;font-weight:600;color:var(--red);white-space:nowrap}
+.mq-flag{font-size:11.5px;font-weight:600;color:#8E1A10;background:#FCE3E0;border-radius:5px;padding:1px 7px;white-space:nowrap}
+.mqrow .badge{margin:0}
+.mqrow.drag.dragging{opacity:.45}
+.mqrow.drag.dropabove{box-shadow:inset 0 2px 0 var(--accent)}
+.mqrow.drag.dropbelow{box-shadow:inset 0 -2px 0 var(--accent)}
+.mqrow.drag:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.mqrow .grip{width:12px}
+.gripspace{width:12px;flex:none}
+.rankslot{width:22px;height:22px;display:grid;place-items:center;flex:none;color:var(--muted)}
+.rankslot.att{color:var(--red)}
+.nextup b{font-weight:500;color:var(--ink)}
+.mqrow .badge.xs{margin:0}
+.mqrow{height:64px}
+.mq-body{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0}
+.mq-sub{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mq-sub.small{display:block}
 </style>
 </head>
 <body>
@@ -924,7 +952,7 @@ function queueCol() {
   const bar = S.held ? `<div class="qbar"><span class="small">Finish or release this task to claim the next one</span></div>`
     : urgentOpen ? `<div class="qbar"><span class="small">Call me now comes first. Claim it below.</span></div>`
     : `<div class="qbar"><button class="btn ${S.result ? "" : "primary"} sm" data-act="next" ${S.held || !q.length ? "disabled" : ""}>Claim next<kbd>N</kbd></button>
-    <span class="small">Priority first, then due time</span></div>`;
+    ${q.length ? `<span class="small nextup">Next: <b>${esc(q[0].patient)}</b>, ${tname(q[0].type)}</span>` : `<span class="small">Nothing to claim right now</span>`}</div>`;
   h = `<div class="qtop">${bar}${h}</div><div class="qscroll">`;
   if (S.held) {
     const t = byKey(S.held);
@@ -1263,22 +1291,22 @@ const mins = t => Math.max(0, Math.round((Date.now() - t.heldAt) / 60000));
 
 const PIN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>`;
 const GRIP = `<svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="9" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="9" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="9" cy="13" r="1.3"/></svg>`;
+const ALERT_IC = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5v.01"/></svg>`;
 function mqList() {
-  const u = urgentTask(), m = missed().length, nNever = agentsFor("never");
-  const row = (id, label, sub, count, cls = "", tone = "neutral") => `<button class="qitem mq ${S.mq === id || (id === "today" && ["missed","pastdue"].includes(S.mq)) ? "active" : ""}" data-act="mq" data-v="${id}">
-    <span class="qbody"><span class="qtitle">${label}</span><span class="small ${cls}">${sub}</span></span>${count === null ? "" : `<span class="badge ${tone}">${count}</span>`}</button>`;
+  const u = urgentTask(), m = missed().length;
   let h = "";
   if (u) h += alertCard({tone:"red", icon:"bolt", label:"Call me now, nobody has claimed it", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
     name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`]});
-  const nAtt = m + (nNever ? 0 : 1);
-  h += row("today", "Needs attention", "Missed calls, never contacted, past due", null);
+  const naOn = S.mq === "today" || ["missed","pastdue"].includes(S.mq);
+  h += `<button class="mqrow ${naOn ? "active" : ""}" data-act="mq" data-v="today"><span class="mq-lead"><span class="gripspace"></span><span class="rankslot att">${ALERT_IC}</span></span><span class="mq-body"><span class="mq-name">Needs attention</span><span class="mq-sub small">Missed calls, never contacted, past due</span></span><span class="mq-meta"></span></button>`;
   h += `<div class="ghead">Task types<span>most important first</span></div>`;
-  h += `<div class="qitem mq fixedrow"><span class="grip off" aria-hidden="true"></span><span class="rank pin" title="Always first">${PIN}</span><span class="qbody"><span class="qtitle">Call me now</span><span class="small">Always first</span></span><span class="badge muted">0</span></div>`;
+  h += `<div class="mqrow fixed"><span class="mq-lead"><span class="gripspace"></span><span class="rankslot" title="Always first">${PIN}</span></span><span class="mq-body"><span class="mq-name">Call me now</span><span class="mq-sub small">Always first</span></span><span class="mq-meta"><span class="badge muted">0</span></span></div>`;
   S.order.forEach((k, i) => {
-    const ty = S.types[k], [o, p] = ty.stats;
-    h += `<div class="qitem mq drag ${S.mq === k ? "active" : ""}" draggable="true" data-drag="${k}" tabindex="0" role="button" data-act="mq" data-v="${k}" aria-label="${ty.name}, rank ${i + 1} of ${S.order.length}. Alt plus arrow keys to move.">
-      <span class="grip" aria-hidden="true">${GRIP}</span><span class="rank">${i + 1}</span>
-      <span class="qbody"><span class="qtitle">${ty.name}</span>${!agentsFor(k) ? `<span class="small late">No agents</span>` : ""}${p ? `<span class="small"><span class="badge red xs" style="margin-left:0">${p} past due</span></span>` : ""}</span><span class="badge ${o ? "neutral" : "muted"}">${o || 0}</span></div>`;
+    const ty = S.types[k], [o, p] = ty.stats, none = !agentsFor(k);
+    h += `<div class="mqrow drag ${S.mq === k ? "active" : ""}" draggable="true" data-drag="${k}" tabindex="0" role="button" data-act="mq" data-v="${k}" aria-label="${ty.name}, rank ${i + 1} of ${S.order.length}. Alt plus arrow keys to move." title="${ty.name}${p ? `, ${p} past due` : ""}${none ? ", no agents" : ""}">
+      <span class="mq-lead"><span class="grip" aria-hidden="true">${GRIP}</span><span class="rank">${i + 1}</span></span>
+      <span class="mq-body"><span class="mq-name">${ty.name}</span>${none || p ? `<span class="mq-sub">${none ? `<span class="badge red xs">No agents</span>` : ""}${p ? `<span class="badge red xs">${p} past due</span>` : ""}</span>` : ""}</span>
+      <span class="mq-meta"><span class="badge ${o ? "neutral" : "muted"}">${o || 0}</span></span></div>`;
   });
   return h;
 }
@@ -1378,7 +1406,7 @@ function queuesPage() {
   const c = S.mq === "today" ? todayCenter() : S.mq === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
     : S.mq === "pastdue" ? viewCenter("Past due", "Across all task types, oldest first.", S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null).sort((a, b) => a.due - b.due), "Showing a sample of 40")
     : typeCenter(S.mq);
-  return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">Overview first, then queues by priority</span></div><div class="qscroll">${mqList()}</div></aside>
+  return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">${S.order.reduce((s, k) => s + S.types[k].stats[0], 0)} open tasks in ${S.order.length + 1} queues</span></div><div class="qscroll">${mqList()}</div></aside>
     <section class="center">${c}</section><aside class="props">${liveCol()}</aside></div>`;
 }
 function usersPage() {
