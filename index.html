@@ -583,6 +583,50 @@ body{background:#F4F3F1}
 .navh{color:var(--muted)}
 .resetbtn3{width:32px;height:32px;margin-left:6px;display:inline-grid;place-items:center;vertical-align:middle;border:0;border-radius:9px;background:#EEECE8;color:#1D1B18}
 .resetbtn3:hover{background:#E4E1DB}
+/* alert layout hardening (floating card + narrow columns) */
+.floatcard{width:400px}
+.a-head{flex-wrap:nowrap}
+.a-label{white-space:nowrap}
+.a-pill{flex:none}
+.a-meta{flex-wrap:nowrap;overflow:hidden;min-width:0}
+.a-meta span{white-space:nowrap;flex:none}
+.a-meta span:last-child{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.a-main{min-width:0}
+.floatcard{width:448px}
+/* sticky outcome bar */
+.center{display:flex;flex-direction:column}
+.center .detail{flex:1 0 auto;width:100%;padding-bottom:40px}
+.resbar{position:sticky;bottom:0;z-index:5;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.05)}
+.resrow{display:flex;align-items:center;gap:12px;padding:12px 28px;max-width:100%}
+.reslbl{font-size:13px;font-weight:600;white-space:nowrap}
+.resbar .outcomes{flex:1;margin:0;grid-template-columns:repeat(4,minmax(0,1fr))}
+.resbar .outcomes .btn{padding:0 10px;height:36px;font-size:13px}
+.resbar .outcomes .btn kbd{margin-left:6px}
+.respanel{padding:14px 28px 0}
+.respanel .panel{margin:0}
+.respanel .err{margin:0 0 10px}
+@media (max-width:1100px){.reslbl{display:none}}
+/* prototype chrome out of the way of the bar */
+.switcher{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto}
+.pop{top:calc(100% + 10px);bottom:auto}
+.toast{top:calc(72px + env(safe-area-inset-top,0px));bottom:auto}
+.reshead{display:flex;align-items:center;gap:10px;padding:10px 28px 0}
+.reshead .btn.ghost{height:26px;padding:0 6px;font-size:12.5px}
+.reshead .btn.ghost[aria-pressed=true]{color:var(--ink);text-decoration:underline}
+.resrow{padding:8px 28px 14px}
+.resbar .outcomes{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%}
+.resbar .outcomes .btn{justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:1100px){.reslbl{display:inline}}
+.reskeys{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--muted)}
+.reskeys kbd{margin:0}
+.reskeys kbd+kbd{margin-left:0}
+.resbar .outcomes .btn[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:600}
+.resbar .outcomes .btn[aria-pressed=true]{border:2px solid var(--ink);box-shadow:none;font-weight:600}
+.notifask{display:flex;align-items:center;gap:8px;padding:10px 14px 10px 16px;border-bottom:1px solid var(--line);background:#FAFAF9}
+.notifask>div{flex:1;min-width:0;display:flex;flex-direction:column}
+.notifask strong{font-size:13px;font-weight:600}
+.notifask span{font-size:12px;color:var(--muted)}
+.notifask .btn.ghost{height:28px;padding:0 6px;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -752,6 +796,7 @@ function queueCol() {
     name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`],
     note:S.held ? "Claiming puts your current task back in the pool. You get first pick of it after." : "",
     action:`<button class="btn primary sm" data-act="claim" data-key="${u.key}">Claim</button>`});
+  if (canNotify() && Notification.permission === "default" && !S.notifDismissed && me().types.includes("cmn")) h += `<div class="notifask"><div><strong>Don't miss a Call me now</strong><span>Get a sound and a desktop alert while you're in RingCentral or Gmail.</span></div><button class="btn sm" data-act="notifon">Turn on</button><button class="btn ghost sm" data-act="notifno">Not now</button></div>`;
   const soon = S.tasks.find(t => eligible(t) && t.sched != null && t.sched > NOW);
   if (soon && S.held !== soon.key) h += alertCard({tone:"blue", icon:"clock", label:"Scheduled call", pill:`<span>${fmt(soon.sched)}</span>`,
     name:esc(soon.cg), meta:[soon.id, soon.mco, soon.lastBy === "you" ? "You worked this case last" : "Booked by the caregiver"],
@@ -783,7 +828,7 @@ function queueCol() {
     if (grp(t) !== g) { g = grp(t); h += `<div class="ghead">${GROUPS[g]}<span>${q.filter(x => grp(x) === g).length}</span></div>`; }
     h += qItem(t, i + 1, !S.held && sel && sel.key === t.key);
   });
-  return h + `</div><div class="hint"><span><kbd aria-label="Up arrow">↑</kbd><kbd aria-label="Down arrow">↓</kbd> move</span><span><kbd>N</kbd> claim next</span><span><kbd>C</kbd> claim selected</span>${S.held ? `<span><kbd>1</kbd>–<kbd>4</kbd> resolve</span>` : ""}</div>`;
+  return h + `</div>`;
 }
 function qItem(t, n, active) {
   const r = reason(t), mine = S.held === t.key;
@@ -877,11 +922,13 @@ function workspace(t) {
   h += sopBlock(t) + `<h3 class="sh">Call note</h3><div class="box">
     <div class="notef">${NOTE_FIELDS.map(([k, l]) => `<label class="nrow"><span class="nlbl">${l}</span><textarea rows="1" data-cap="${k}" data-grow>${esc(S.capture[k] || "")}</textarea></label>`).join("")}</div>
     <div class="small pad">Leave blank anything that doesn't apply. Posts to the ${t.id} timeline, tagged to this task.</div></div>
-    <h3 class="sh">Resolution</h3><div class="box pad"><div class="lbl">How did the call go?</div><div class="outcomes">
-    ${[["reached","Reached them",1],["noanswer","No answer",2],["later","Call back later",3],["inelig","Not eligible",4]].map(([v, l, k]) =>
-      `<button class="btn" aria-pressed="${S.panel?.variant === v}" data-act="outcome" data-v="${v}">${l}<kbd>${k}</kbd></button>`).join("")}</div>
-    ${S.err ? `<div class="err" role="alert">${S.err}</div>` : ""}${panel(t)}
-    <div class="resfoot"><button class="btn ghost sm" data-act="panel" data-v="release">Release without finishing</button></div></div>${timeline(t)}</div>`;
+    ${timeline(t)}</div>
+    <div class="resbar" role="region" aria-label="Call outcome">
+      ${S.panel || S.err ? `<div class="respanel">${S.err ? `<div class="err" role="alert">${S.err}</div>` : ""}${panel(t)}</div>` : ""}
+      <div class="reshead"><span class="reslbl">How did the call go?</span><span class="grow"></span><button class="btn ghost sm" data-act="panel" data-v="release" aria-pressed="${S.panel?.variant === "release"}">Release without finishing</button></div>
+      <div class="resrow"><div class="outcomes">
+      ${[["reached","Reached them",1],["noanswer","No answer",2],["later","Call back later",3],["inelig","Not eligible",4]].map(([v, l, k]) =>
+        `<button class="btn" aria-pressed="${S.panel?.variant === v}" data-act="outcome" data-v="${v}" aria-keyshortcuts="${k}">${l}</button>`).join("")}</div></div></div>`;
   return h;
 }
 function center() {
@@ -1245,7 +1292,46 @@ function render() {
   placeDD();
 }
 function growAll() { document.querySelectorAll("[data-grow]").forEach(grow); }
+// ---------- alerts outside Mission Control ----------
+const BASE_TITLE = document.title;
+const canNotify = () => "Notification" in window;
+function chime(late) {
+  try {
+    const ctx = chime.ctx || (chime.ctx = new (window.AudioContext || window.webkitAudioContext)());
+    const notes = late ? [660, 520, 660] : [880, 1175];
+    notes.forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain(), t0 = ctx.currentTime + i * 0.18;
+      o.type = "sine"; o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.16);
+      o.start(t0); o.stop(t0 + 0.18);
+    });
+  } catch (e) {}
+}
+function osNotify(u, late) {
+  if (!canNotify() || Notification.permission !== "granted") return;
+  try {
+    const n = new Notification(late ? `Still waiting: ${u.cg}` : `${u.cg} asked to be called now`, {
+      body: late ? `${u.id} · ${u.mco}. Past the 2-minute target. First to claim gets it.` : `${u.id} · ${u.mco}. First to claim gets it.`,
+      tag: "call-me-now-" + u.key, requireInteraction: true, renotify: late
+    });
+    n.onclick = () => { window.focus(); S.view = "tasks"; render(); n.close(); };
+  } catch (e) {}
+}
+function alertOutside(u, late) {
+  if (!me().types.includes("cmn") || S.held === u.key) return;
+  chime(late); osNotify(u, late);
+}
+function updateTitle() {
+  const u = urgentTask();
+  if (u && me().types.includes("cmn") && S.view !== "queues" && S.view !== "users") {
+    const rem = 120 - Math.floor((Date.now() - u.createdMs) / 1000);
+    const f = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    document.title = `(1) Call me now ${rem >= 0 ? f(rem) : "late " + f(-rem)} · Mission Control`;
+    if (rem < 0 && !u.lateAlerted) { u.lateAlerted = true; alertOutside(u, true); }
+  } else document.title = BASE_TITLE;
+}
 function tick() {
+  updateTitle();
   document.querySelectorAll("[data-cd]").forEach(el => {
     const rem = 120 - Math.floor((Date.now() - +el.dataset.cd) / 1000);
     const f = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -1282,7 +1368,7 @@ document.addEventListener("click", e => {
     case "sc":
       S.demo = false;
       if (v === "reset") { S = init(); break; }
-      if (v === "cmn" && !urgentTask()) S.tasks.push(Object.assign(T(1488, "Walter Marsh", "Delia Marsh", "daughter", "(512) 555-0182", "cmn", "Molina", {due:NOW + 2, created:20260928, note:"Asked to be called now from the website"}), {createdMs:Date.now()}));
+      if (v === "cmn" && !urgentTask()) setTimeout(() => { const u = urgentTask(); if (u) alertOutside(u, false); }, 50), S.tasks.push(Object.assign(T(1488, "Walter Marsh", "Delia Marsh", "daughter", "(512) 555-0182", "cmn", "Molina", {due:NOW + 2, created:20260928, note:"Asked to be called now from the website"}), {createdMs:Date.now()}));
       if (v === "heads") { const h = S.tasks.find(t => t.patient === "Hector Vela"); if (h.status === "open") { h.sched = NOW + 5; h.due = h.sched; } }
       if (v === "idle") {
         if (!S.held) { toast("Claim a task first, then try this."); break; }
@@ -1306,6 +1392,8 @@ document.addEventListener("click", e => {
     case "toggleprops": S.propsOpen = !S.propsOpen; break;
     case "claimgo": S.view = "tasks"; return claim(key);
     case "skipback": S.offerBack = null; break;
+    case "notifon": chime(false); if (canNotify()) { try { Notification.requestPermission().then(p => { if (p !== "granted") toast("Desktop alerts are blocked in this browser. You'll still get the sound and the tab counter."); render(); }); } catch (e) {} } S.notifDismissed = true; break;
+    case "notifno": S.notifDismissed = true; break;
     case "dismiss": S.notice = null; break;
     case "call": S.onCall = !S.onCall; S.touched = true; break;
     case "cap": S.capture[k] = v; S.err = null; S.touched = true; break;
