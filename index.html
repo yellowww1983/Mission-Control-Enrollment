@@ -712,6 +712,9 @@ body{background:#F4F3F1}
 .loadtable .qtitle{white-space:normal}
 .loadtable td:nth-child(2){white-space:normal;width:100%}
 .loadtable .lr-bar{max-width:none}
+.qitem.active .small.late,.qitem.active .reason.late{color:var(--red)}
+.tag.blue{background:#E8EEFB;color:#1A46A3}
+.crumblink{color:var(--muted);text-decoration:none;font-size:12.5px}.crumblink:hover{color:var(--ink);text-decoration:underline}
 </style>
 </head>
 <body>
@@ -856,7 +859,6 @@ function queue() {
 }
 function reason(t) {
   if (t.assignedTo === "jasmine") return {text:"Assigned to you by Kelsey", cls:"soon"};
-  if (raised(t)) return {text:"Raised by Kelsey", cls:"soon"};
   if (t.sched != null) {
     if (t.sched <= NOW) return {text:`Missed scheduled call at ${fmt(t.sched)}, ${dur(NOW - t.sched)} late`, cls:"late"};
     return {text:`Scheduled for ${fmt(t.sched)}, in ${t.sched - NOW} min`, cls:"soon"};
@@ -882,7 +884,7 @@ function alertCard(o) {
 }
 
 function urgentTask() { return S.tasks.find(t => t.type === "cmn" && t.status === "open"); }
-const GROUPS = ["Raised for you", "Missed scheduled calls", "Scheduled calls coming up", "Next by priority"];
+const GROUPS = ["Assigned to you", "Late for a booked call", "Scheduled calls coming up", "Up next"];
 function currentSel() {
   if (S.held) return byKey(S.held);
   const q = queue();
@@ -937,7 +939,7 @@ function qItem(t, n, active) {
     <span class="qn">${n}</span><span class="qbody"><span class="qtitle">${tname(t.type)}</span>
     <span class="small">${ml(t.id, esc(t.patient), esc(t.mco))}</span>
     <span class="reason ${mine ? "good" : r.cls}">${mine ? "Claimed by you" : r.text}</span>
-    ${t.attempts && !mine ? `<span class="tag warn">Back in the pool, attempt ${t.attempts + 1}</span>` : ""}${t.blockedBy ? `<span class="tag">Blocked by ${esc(t.blockedBy.split(":")[0])}</span>` : ""}</span></button>`;
+    ${raised(t) && !mine ? `<span class="tag blue">Raised by Kelsey</span>` : ""}${t.attempts && !mine ? `<span class="tag warn">Back in the pool, attempt ${t.attempts + 1}</span>` : ""}${t.blockedBy ? `<span class="tag">Blocked by ${esc(t.blockedBy.split(":")[0])}</span>` : ""}</span></button>`;
 }
 function crumbs(t, right) {
   return `<div class="crumbs"><span class="small">${ml("Enrollment", "Tasks", t ? t.id : "", t ? tname(t.type) : "")}</span><span class="grow"></span>${right || ""}</div>`;
@@ -1259,25 +1261,21 @@ const PIN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke=
 const GRIP = `<svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="9" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="9" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="9" cy="13" r="1.3"/></svg>`;
 function mqList() {
   const u = urgentTask(), m = missed().length, nNever = agentsFor("never");
-  const row = (id, label, sub, count, cls = "", tone = "neutral") => `<button class="qitem mq ${S.mq === id ? "active" : ""}" data-act="mq" data-v="${id}">
+  const row = (id, label, sub, count, cls = "", tone = "neutral") => `<button class="qitem mq ${S.mq === id || (id === "today" && ["missed","pastdue"].includes(S.mq)) ? "active" : ""}" data-act="mq" data-v="${id}">
     <span class="qbody"><span class="qtitle">${label}</span><span class="small ${cls}">${sub}</span></span>${count === null ? "" : `<span class="badge ${tone}">${count}</span>`}</button>`;
   let h = "";
   if (u) h += alertCard({tone:"red", icon:"bolt", label:"Call me now, nobody has claimed it", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
     name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`]});
-  h += row("today", "Today", "Alarms, queue load and who’s working", null);
-  h += `<div class="ghead">Needs attention</div>`;
-  h += row("missed", "Missed scheduled calls", m ? "A caregiver booked a time, nobody called" : "Every booked call was made", m, m ? "late" : "", m ? "red" : "green");
-  h += row("never", "Never contacted", nNever ? `${nNever} agent${nNever > 1 ? "s" : ""} on it` : "Nobody works this queue", 217, nNever ? "" : "late", "red");
-  h += row("pastdue", "Past due", "All task types, oldest first", 40, "", "amber");
+  const nAtt = m + (nNever ? 0 : 1);
+  h += row("today", "Needs attention", "Missed calls, never contacted, past due", null);
   h += `<div class="ghead">Task types<span>most important first</span></div>`;
   h += `<div class="qitem mq fixedrow"><span class="grip off" aria-hidden="true"></span><span class="rank pin" title="Always first">${PIN}</span><span class="qbody"><span class="qtitle">Call me now</span><span class="small">Always first</span></span><span class="badge muted">0</span></div>`;
   S.order.forEach((k, i) => {
     const ty = S.types[k], [o, p] = ty.stats;
     h += `<div class="qitem mq drag ${S.mq === k ? "active" : ""}" draggable="true" data-drag="${k}" tabindex="0" role="button" data-act="mq" data-v="${k}" aria-label="${ty.name}, rank ${i + 1} of ${S.order.length}. Alt plus arrow keys to move.">
       <span class="grip" aria-hidden="true">${GRIP}</span><span class="rank">${i + 1}</span>
-      <span class="qbody"><span class="qtitle">${ty.name}</span>${p ? `<span class="small"><span class="badge red xs" style="margin-left:0">${p} past due</span></span>` : ""}</span><span class="badge ${o ? "neutral" : "muted"}">${o || 0}</span></div>`;
+      <span class="qbody"><span class="qtitle">${ty.name}</span>${!agentsFor(k) ? `<span class="small late">No agents</span>` : ""}${p ? `<span class="small"><span class="badge red xs" style="margin-left:0">${p} past due</span></span>` : ""}</span><span class="badge ${o ? "neutral" : "muted"}">${o || 0}</span></div>`;
   });
-  h += `<div class="draghint">Drag to reorder. Higher means more important for every agent.</div>`;
   return h;
 }
 function taskTable(rows, foot) {
@@ -1293,7 +1291,7 @@ function taskTable(rows, foot) {
     </tbody></table></div>${foot ? `<div class="small">${foot}</div>` : ""}`;
 }
 function viewCenter(title, lead, rows, foot) {
-  return `<div class="crumbs"><span class="small">${ml("Queues", title)}</span></div><div class="detail wide">
+  return `<div class="crumbs"><button class="linkbtn crumblink" data-act="mq" data-v="today">Needs attention</button><span class="small">›</span><span class="small">${title}</span></div><div class="detail wide">
     <h1>${title}</h1><p class="lead">${lead}</p>${taskTable(rows, foot)}</div>`;
 }
 function typeCenter(k) {
@@ -1356,8 +1354,8 @@ function todayCenter() {
       <td><div class="qtitle">${ty.name}</div><div class="lr-bar"><span style="width:${Math.max(o ? 3 : 0, Math.round(o / 217 * 100))}%"></span>${p ? `<span class="lr-late" style="width:${Math.round(p / 217 * 100)}%"></span>` : ""}</div></td>
       <td class="num">${o}</td><td>${p ? `<span class="badge red xs" style="margin:0">${p} past due</span>` : `<span class="small">On time</span>`}</td>
       <td class="small ${n ? "" : "late"}">${n ? `${n} agent${n > 1 ? "s" : ""}` : "No agents"}</td><td class="small">${old}</td></tr>`; }).join("");
-  return `<div class="crumbs"><span class="small">${ml("Queues", "Today")}</span></div><div class="detail wide">
-    <h1>Today</h1><p class="lead">What needs attention, how loaded each queue is, and who is working on what.</p>
+  return `<div class="crumbs"><span class="small">${ml("Queues", "Needs attention")}</span></div><div class="detail wide">
+    <h1>Needs attention</h1><p class="lead">Start here. Click a card to see those tasks across every queue.</p>
     <div class="cards cards3">${card("missed", m.length, "red", "Missed calls", m.length ? `${m[0].patient}, ${dur(NOW - m[0].sched)} late` : "All calls made")}${card("never", 217, "red", "Never contacted", nNever ? `Rank ${rankOf("never")} of ${S.order.length}` : "No agents on it")}${card("pastdue", 40, "amber", "Past due", "All task types")}</div>
     <h3 class="sh">Queue load <span class="small" style="font-weight:400">in priority order</span></h3>
     <div class="table-wrap"><table class="loadtable"><thead><tr><th style="width:44px"></th><th>Task type</th><th class="num">Open</th><th>Past due</th><th>Agents</th><th>Oldest</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
@@ -1376,7 +1374,7 @@ function queuesPage() {
   const c = S.mq === "today" ? todayCenter() : S.mq === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
     : S.mq === "pastdue" ? viewCenter("Past due", "Across all task types, oldest first.", S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null).sort((a, b) => a.due - b.due), "Showing a sample of 40")
     : typeCenter(S.mq);
-  return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">Needs attention first, then by priority</span></div><div class="qscroll">${mqList()}</div></aside>
+  return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">Overview first, then queues by priority</span></div><div class="qscroll">${mqList()}</div></aside>
     <section class="center">${c}</section><aside class="props">${liveCol()}</aside></div>`;
 }
 function usersPage() {
