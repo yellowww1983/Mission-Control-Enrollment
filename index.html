@@ -627,6 +627,91 @@ body{background:#F4F3F1}
 .notifask strong{font-size:13px;font-weight:600}
 .notifask span{font-size:12px;color:var(--muted)}
 .notifask .btn.ghost{height:28px;padding:0 6px;font-size:12.5px}
+/* out-of-order claim popover */
+.ooowrap{position:relative;display:inline-block}
+.ooopop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:340px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 12px 32px rgba(0,0,0,.14);text-align:left}
+.ooopop strong{display:block;font-size:14px;font-weight:600}
+.ooopop p{margin:4px 0 10px;font-size:13px;color:var(--muted);line-height:1.45}
+.ooopop .chips{margin-top:0}
+.oooact{display:flex;align-items:center;gap:8px;margin-top:14px}
+.oooact .btn.ghost{font-size:12.5px;padding:0 6px}
+.caselinks{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.clink{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;color:var(--ink)}
+.clink:hover{border-color:#BDBAB4;background:#FAFAF9}
+.clink .ck{color:var(--muted);font-size:12px}
+.token .tmco{font-size:11.5px;color:var(--muted);font-weight:500;margin-left:6px}
+.matrix td .dd .ddbtn{min-width:128px;justify-content:space-between;height:30px}
+.mgr{max-width:1240px}
+.matrix th.c{white-space:normal;line-height:1.25;max-width:78px;vertical-align:bottom}
+.matrix th.c,.matrix td.c{padding-left:6px;padding-right:6px}
+.matrix th.num{white-space:normal;line-height:1.25;max-width:70px;vertical-align:bottom}
+.warnline{white-space:nowrap}
+/* draggable type order */
+.qitem.mq.drag,.qitem.mq.fixedrow{align-items:center;gap:10px;padding:10px 14px 10px 10px;cursor:pointer}
+.qitem.mq.fixedrow{cursor:default;background:#FAFAF9}
+.grip{width:14px;display:grid;place-items:center;color:#B3AEA6;cursor:grab;flex:none}
+.grip.off{visibility:hidden}
+.qitem.drag:hover .grip{color:var(--muted)}
+.rank{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;font-size:11.5px;font-weight:600;color:var(--muted);flex:none;background:#fff}
+.qitem.mq.active .rank{background:var(--ink);border-color:var(--ink);color:#fff}
+.qitem.drag.dragging{opacity:.45}
+.qitem.drag.dropabove{box-shadow:inset 0 2px 0 var(--accent)}
+.qitem.drag.dropbelow{box-shadow:inset 0 -2px 0 var(--accent)}
+.qitem.drag:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.draghint{padding:10px 16px 16px;font-size:12px;color:var(--muted)}
+.stepper.labeled b{min-width:52px;font-size:12.5px}
+.stepper button:disabled{opacity:.35;cursor:default}
+.rank.pin{border-color:transparent;background:transparent;color:var(--muted)}
+.stepper.sm b{min-width:44px;font-size:12px}
+/* Today */
+.mgr.today{max-width:1180px}
+.mgr.today .alert{border:1px solid var(--line);border-radius:12px;margin:0 0 16px;overflow:hidden}
+.alarms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.alarm{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.alarm:hover{border-color:#BDBAB4}
+.alarm .al-t{font-size:15px;font-weight:600;margin-top:8px}
+.alarm .al-s{font-size:13px;color:var(--muted)}
+.al-list{display:flex;flex-direction:column;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);width:100%;font-size:13px}
+.al-list em{font-style:normal;color:var(--muted);margin-left:6px}
+.todaygrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.tcard{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.tc-h{display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;border-bottom:1px solid var(--line)}
+.tc-h h3{font-size:15px;font-weight:600}
+.loadrows{display:flex;flex-direction:column}
+.loadrow{display:grid;grid-template-columns:24px minmax(0,1.3fr) minmax(0,1fr) 40px 96px 74px 76px;align-items:center;gap:10px;padding:10px 16px;border:0;border-bottom:1px solid var(--line);background:#fff;text-align:left}
+.loadrow:last-child{border-bottom:0}
+.loadrow:hover{background:#FAFAF9}
+.lr-name{font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-bar{position:relative;height:8px;border-radius:4px;background:#EFEEEB;overflow:hidden}
+.lr-bar span{position:absolute;left:0;top:0;bottom:0;background:#8C867C;border-radius:4px}
+.lr-bar .lr-late{background:#C0362C}
+.lr-num{font-size:13.5px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.lr-meta{white-space:nowrap}
+.nowlist{display:flex;flex-direction:column}
+.nowrow{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:13.5px}
+.nowrow:last-child{border-bottom:0}
+.nw-name{font-weight:500}
+.nowrow .small{text-align:right}
+@media (max-width:1100px){.alarms{grid-template-columns:1fr}.todaygrid{grid-template-columns:1fr}}
+.nowrow{flex-direction:column;align-items:flex-start;gap:2px}
+.nw-top{display:flex;align-items:center;gap:8px}
+.nw-top .tag{white-space:nowrap}
+.nowrow .small{text-align:left}
+.loadtable{min-width:0}
+.loadtable td{padding:10px 14px}
+.loadtable .lr-bar{margin-top:6px;max-width:260px}
+.clickrow{cursor:pointer}
+.clickrow:hover td{background:#FAFAF9}
+.cards .card3{min-width:0}
+.cards.cards3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.loadtable td,.loadtable th{white-space:nowrap}
+.loadtable .qtitle{white-space:nowrap}
+.loadtable td,.loadtable th{padding:10px 8px}
+.loadtable td:first-child,.loadtable th:first-child{padding-left:14px}
+.loadtable td:last-child,.loadtable th:last-child{padding-right:14px}
+.loadtable .qtitle{white-space:normal}
+.loadtable td:nth-child(2){white-space:normal;width:100%}
+.loadtable .lr-bar{max-width:none}
 </style>
 </head>
 <body>
@@ -687,23 +772,23 @@ function seedTasks() {
 function init() {
   seq = 0;
   return {
-    view:"tasks", sel:null, navOpen:true, propsOpen:true, mq:"missed", mfilter:"all", editAgents:false, filter:null, demo:false,
+    view:"tasks", sel:null, order:["inbound","sms","fmco","escalation","pson","auth","never"], navOpen:true, propsAgent:false, propsMgr:true, mq:"today", mfilter:"all", editAgents:false, filter:null, demo:false,
     types:JSON.parse(JSON.stringify(TYPES)),
     agents:[
-      {id:"jasmine",name:"Jasmine Okafor",on:true,types:["cmn","fmco","escalation","pson","auth"],yesterday:["cmn","inbound"],worked:6,closed:4},
-      {id:"marcus",name:"Marcus Owens",on:true,types:["cmn","escalation"],yesterday:["cmn","escalation"],worked:5,closed:3,now:"Case escalation, Irene Cole",mins:38},
-      {id:"devon",name:"Devon Adams",on:true,types:["cmn","fmco"],yesterday:["auth"],worked:7,closed:5,now:"First MCO call, Carla Diaz",mins:19},
-      {id:"trina",name:"Trina Walsh",on:true,types:["cmn","fmco","pson"],yesterday:["fmco"],worked:4,closed:2,now:"Nothing held since 10:40 AM"},
-      {id:"sam",name:"Sam Kowalski",on:true,types:["cmn","pson","auth"],yesterday:["inbound"],worked:5,closed:4,now:"Nothing held, 1 paused until 2:30 PM"},
-      {id:"priya",name:"Priya Nair",on:true,types:["inbound"],yesterday:["fmco"],worked:11,closed:9,now:"On an inbound call"},
-      {id:"aisha",name:"Aisha Bello",on:true,types:["sms"],yesterday:["escalation"],worked:23,closed:20,now:"Answering texts"},
-      {id:"leo",name:"Leo Martins",on:false,outUntil:"Out until Fri, Oct 2",types:["fmco"],yesterday:["fmco"],worked:0,closed:0}
+      {id:"jasmine",mcos:[],ymcos:[],ooo:0,name:"Jasmine Okafor",on:true,types:["cmn","fmco","escalation","pson","auth"],yesterday:["cmn","inbound"],worked:6,closed:4},
+      {id:"marcus",mcos:["Molina"],ymcos:["Molina"],ooo:3,name:"Marcus Owens",on:true,types:["cmn","escalation"],yesterday:["cmn","escalation"],worked:5,closed:3,now:"Case escalation, Irene Cole",mins:38},
+      {id:"devon",mcos:["Superior"],ymcos:["Molina"],ooo:1,name:"Devon Adams",on:true,types:["cmn","fmco"],yesterday:["auth"],worked:7,closed:5,now:"First MCO call, Carla Diaz",mins:19},
+      {id:"trina",mcos:[],ymcos:[],ooo:0,name:"Trina Walsh",on:true,types:["cmn","fmco","pson"],yesterday:["fmco"],worked:4,closed:2,now:"Nothing held since 10:40 AM"},
+      {id:"sam",mcos:["Amerigroup","UnitedHealthcare"],ymcos:["Superior"],ooo:2,name:"Sam Kowalski",on:true,types:["cmn","pson","auth"],yesterday:["inbound"],worked:5,closed:4,now:"Nothing held, 1 paused until 2:30 PM"},
+      {id:"priya",mcos:[],ymcos:[],ooo:0,name:"Priya Nair",on:true,types:["inbound"],yesterday:["fmco"],worked:11,closed:9,now:"On an inbound call"},
+      {id:"aisha",mcos:[],ymcos:[],ooo:0,name:"Aisha Bello",on:true,types:["sms"],yesterday:["escalation"],worked:23,closed:20,now:"Answering texts"},
+      {id:"leo",mcos:[],ymcos:[],ooo:0,name:"Leo Martins",on:false,outUntil:"Out until Fri, Oct 2",types:["fmco"],yesterday:["fmco"],worked:0,closed:0}
     ],
     tasks:seedTasks(), held:null, interruptedKey:null, offerBack:null, panel:null, choice:{}, capture:{},
     err:null, result:null, toast:null, collide:false, onCall:false
   };
 }
-let S = init();
+let S = init(); applyOrder();
 
 // helpers
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -719,10 +804,26 @@ const me = () => agent("jasmine");
 const agentsFor = type => S.agents.filter(a => a.on && a.types.includes(type)).length;
 const checkSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 
+function applyOrder(prevP) {
+  S.order.forEach((k, i) => { S.types[k].p = Math.max(1, 9 - i); });
+  S.types.cmn.p = 10;
+  if (prevP) for (const t of S.tasks) if (t.pOver != null) { const d = t.pOver - prevP[t.type]; t.pOver = Math.min(10, Math.max(1, S.types[t.type].p + d)); if (t.pOver === S.types[t.type].p) t.pOver = null; }
+}
+function moveType(k, to) {
+  const prevP = Object.fromEntries(Object.entries(S.types).map(([x, y]) => [x, y.p]));
+  const from = S.order.indexOf(k); if (from < 0) return;
+  S.order.splice(from, 1); S.order.splice(Math.max(0, Math.min(to, S.order.length)), 0, k);
+  applyOrder(prevP);
+}
+const rankOf = k => S.order.indexOf(k) + 1;
+const MCOS = ["Superior","Molina","Amerigroup","Cigna","UnitedHealthcare"];
+const mcoOk = (a, t) => !a.mcos || !a.mcos.length || t.mco === "Unknown" || a.mcos.includes(t.mco);
+const mcoLabel = a => !a.mcos || !a.mcos.length ? "All MCOs" : a.mcos.length <= 2 ? a.mcos.map(m => m === "UnitedHealthcare" ? "UHC" : m).join(", ") : `${a.mcos.length} MCOs`;
 function eligible(t) {
   if (t.status !== "open" || t.type === "cmn") return false;
   if (t.assignedTo) return t.assignedTo === "jasmine";
   if (!me().types.includes(t.type)) return false;
+  if (!mcoOk(me(), t)) return false;
   return t.sched == null || t.sched - NOW <= 5;
 }
 function grp(t) {
@@ -755,7 +856,7 @@ function queue() {
 }
 function reason(t) {
   if (t.assignedTo === "jasmine") return {text:"Assigned to you by Kelsey", cls:"soon"};
-  if (raised(t)) return {text:`Raised to P${t.pOver} by Kelsey`, cls:"soon"};
+  if (raised(t)) return {text:"Raised by Kelsey", cls:"soon"};
   if (t.sched != null) {
     if (t.sched <= NOW) return {text:`Missed scheduled call at ${fmt(t.sched)}, ${dur(NOW - t.sched)} late`, cls:"late"};
     return {text:`Scheduled for ${fmt(t.sched)}, in ${t.sched - NOW} min`, cls:"soon"};
@@ -803,7 +904,7 @@ function queueCol() {
     note:S.held ? "Finish your current task to claim it." : "",
     action:S.held ? "" : `<button class="btn sm" data-act="claim" data-key="${soon.key}">Claim</button>`});
   const nt = S.notice && byKey(S.notice);
-  if (nt && raised(nt) && eligible(nt) && !S.held) h += alertCard({tone:"blue", icon:"up", label:"Raised by Kelsey", pill:`<span>P${nt.pOver}</span>`,
+  if (nt && raised(nt) && eligible(nt) && !S.held) h += alertCard({tone:"blue", icon:"up", label:"Raised by Kelsey", pill:"",
     name:esc(nt.patient), meta:[tname(nt.type), nt.id, nt.mco],
     action:`<button class="btn ghost sm" data-act="dismiss">Dismiss</button><button class="btn sm" data-act="claim" data-key="${nt.key}">Claim</button>`});
   if (S.offerBack) {
@@ -870,7 +971,7 @@ function timeline(t) {
   const pill = x => `<span class="tl-pill">${esc(x)}</span>`;
   const ev = [];
   const today = cDay === "Sep 28" ? "Today" : "Today";
-  if (S.held === t.key) ev.push({day:"Today", time:"11:29 AM", html:`You claimed ${pill(tname(t.type))}`});
+  if (S.held === t.key) ev.push({day:"Today", time:"11:29 AM", html:`You claimed ${pill(tname(t.type))}${t.oooReason ? " out of order" : ""}`, note:t.oooReason ? "Reason: " + t.oooReason : ""});
   if (t.pOver != null) ev.push({day:"Today", time:"11:20 AM", html:`Kelsey Anderson set this task to ${pill("P" + t.pOver)}`});
   if (t.releases) ev.push({day:"Today", time:"9:52 AM", html:`${esc(t.lastBy || "An agent")} released this task back to the pool`, note:"Reason: Waiting on another team"});
   if (t.pauses) ev.push({day:"Today", time:"9:40 AM", html:`${esc(t.lastBy || "An agent")} paused this task until ${pill("11:00 AM")}`, note:"Reason: No answer"});
@@ -891,9 +992,15 @@ function blocked(t) { return t.blockedBy ? `<div class="blockbox"><b>Blocked by 
 function preview(t) {
   const r = reason(t);
   const blockedByHeld = S.held && t.type !== "cmn";
-  const right = blockedByHeld ? `<span class="small">Finish your current task to claim</span>` : `<button class="btn sm" data-act="claim" data-key="${t.key}">Claim this task<kbd>C</kbd></button>`;
+  const nextUp = queue()[0];
+  const pop = S.ooo && S.ooo.key === t.key ? `<div class="ooopop" role="dialog" aria-label="Taking this out of order">
+    <strong>Taking this out of order?</strong>
+    <p>Next in line is ${esc(nextUp ? nextUp.patient : "")}${nextUp ? `, ${tname(nextUp.type)}` : ""}. Tell Kelsey why you're skipping it.</p>
+    <div class="chips">${OOO_REASONS.map(r => `<button class="chip" aria-pressed="${S.ooo.reason === r}" data-act="oooreason" data-v="${esc(r)}">${esc(r)}</button>`).join("")}</div>
+    <div class="oooact"><button class="btn primary sm" data-act="oooconfirm" ${S.ooo.reason ? "" : "disabled"}>Claim anyway</button><button class="btn ghost sm" data-act="next">Take next in line instead</button></div></div>` : "";
+  const right = blockedByHeld ? `<span class="small">Finish your current task to claim</span>` : `<span class="ooowrap"><button class="btn sm" data-act="claim" data-key="${t.key}" aria-expanded="${!!pop}">Claim this task<kbd>C</kbd></button>${pop}</span>`;
   return crumbs(t, right) + `<div class="detail"><h1>${tname(t.type)}</h1>
-    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
+    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>${caseLinks(t)}
     ${t.attempts ? attemptTag(t) : ""}${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, false)}
     ${t.extras.length ? `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box pad">
@@ -905,7 +1012,7 @@ function workspace(t) {
   const r = reason(t);
   const hasPhone = (S.capture.phone || "").trim().length > 5, hasConsent = !!S.capture.consent;
   let h = crumbs(t, `<span class="tag good">Claimed by you</span>`) + `<div class="detail"><h1>${tname(t.type)}</h1>
-    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
+    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>${caseLinks(t)}
     <p class="small touch">This stays yours while you work it. After 5 minutes with no call, note or field change, it goes back to the pool.</p>${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, true)}`;
   if (t.extras.length) {
@@ -946,6 +1053,11 @@ function center() {
 function age(t) { const s = String(t.created), d = new Date(+s.slice(0,4), +s.slice(4,6)-1, +s.slice(6,8)); const n = Math.round((new Date(2026,8,28) - d) / 864e5); return n < 1 ? "Today" : `${n} d`; }
 const pc = id => (S.pc || {})[id] ? "closed" : "";
 const phead = (id, title) => `<button class="phead" data-act="psec" data-v="${id}" aria-expanded="${!(S.pc || {})[id]}"><span>${title}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>`;
+const propsOpen = () => S.view === "tasks" ? S.propsAgent : S.propsMgr;
+function caseLinks(t) {
+  const L = [[t.id, "#8B6CEF", "Case"], [t.patient, "#D9534F", "Patient"], [t.cg, "#3B82F6", "Caregiver"], [t.mco, "#B7892E", "MCO"]];
+  return `<div class="caselinks">${L.map(([v, c, k]) => `<button class="clink" data-act="nav" data-v="${k === "Case" ? "cases" : k === "Patient" ? "patients" : k === "Caregiver" ? "caregivers" : "cases"}" title="Open ${k.toLowerCase()}"><span class="dot" style="background:${c}"></span><span class="ck">${k}</span>${esc(v)}</button>`).join("")}</div>`;
+}
 function props() {
   const t = S.held ? byKey(S.held) : (S.result ? null : currentSel());
   if (!t) return `<div class="small" style="padding:20px">Select a task to see its details.</div>`;
@@ -998,7 +1110,19 @@ function nextFor(t) {
 }
 
 // ---------- actions ----------
-function claim(key) {
+const OOO_REASONS = ["Caregiver called back", "Same case as my last call", "Language match", "Kelsey asked me to", "Other"];
+function outOfOrder(t) {
+  if (!t || t.type === "cmn" || t.assignedTo === "jasmine") return false;
+  if (S.notice === t.key || S.offerBack === t.key) return false;
+  if (t.sched != null && t.sched > NOW && t.sched - NOW <= 5) return false;
+  const q = queue();
+  return q.length > 0 && q[0].key !== t.key;
+}
+function claim(key, opts = {}) {
+  const tt = byKey(key);
+  if (!opts.force && !S.held && outOfOrder(tt)) { S.ooo = {key, reason:null}; S.sel = key; return render(); }
+  if (opts.reason) { tt.oooReason = opts.reason; me().ooo = (me().ooo || 0) + 1; setTimeout(() => { toast(`Claimed out of order: ${opts.reason}. Kelsey sees this in Users.`); render(); }, 0); }
+  S.ooo = null;
   const t = byKey(key);
   if (!t || t.status !== "open") { toast("Someone else took that one. It's gone from your queue."); return render(); }
   let msg = null;
@@ -1023,11 +1147,11 @@ function takeNext() {
     lost.status = "held"; lost.heldBy = "devon"; lost.heldAt = Date.now();
     Object.assign(agent("devon"), {now:`${tname(lost.type)}, ${lost.patient}`, mins:0});
     S.collide = false;
-    claim(q[1].key);
+    claim(q[1].key, {force:true});
     toast(`Devon took ${lost.patient} a moment before you. You've got the next one: ${q[1].patient}.`);
     return render();
   }
-  claim(q[0].key);
+  claim(q[0].key, {force:true});
 }
 function outcome(v) {
   S.err = null;
@@ -1079,17 +1203,24 @@ function finish(kind) {
 const CHEV = `<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 const TICK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 function dd(o) {
-  const open = S.dd === o.id, cur = o.options.find(x => x.v === o.value);
+  const open = S.dd === o.id, cur = o.multi ? {l:o.display} : o.options.find(x => x.v === o.value);
+  const sel = x => o.multi ? (x.v === "__all" ? !o.value.length : o.value.includes(x.v)) : x.v === o.value;
   return `<span class="dd ${o.small ? "sm" : ""}" data-ddid="${esc(o.id)}"><button type="button" class="fsel ddbtn" data-act="ddopen" data-v="${esc(o.id)}" aria-haspopup="listbox" aria-expanded="${open}"${o.aria ? ` aria-label="${esc(o.aria)}"` : ""}>
     ${o.label ? `<span class="fl">${o.label}</span>` : ""}<span class="dv ${cur ? "" : "dph"}">${cur ? esc(cur.l) : esc(o.placeholder || "Select")}</span>${CHEV}</button>
     ${open ? `<div class="apop ddpop" data-align="${o.align || "left"}">${o.search ? `<input type="search" data-ddq placeholder="Search" aria-label="Search" autocomplete="off">` : ""}
-      <div class="aopts" role="listbox">${o.options.map(x => `<button type="button" class="aopt dopt" role="option" aria-selected="${x.v === o.value}" data-act="ddpick" data-dd="${esc(o.id)}" data-v="${esc(x.v)}" data-name="${esc(String(x.l).toLowerCase())}"${x.disabled ? " disabled" : ""}>
-        <span class="drow"><span>${esc(x.l)}</span>${x.v === o.value ? TICK : ""}</span>${x.sub ? `<span class="small">${esc(x.sub)}</span>` : ""}</button>`).join("")}
+      <div class="aopts" role="listbox">${o.options.map(x => `<button type="button" class="aopt dopt" role="option" aria-selected="${sel(x)}" data-act="ddpick" data-dd="${esc(o.id)}" data-v="${esc(x.v)}" data-name="${esc(String(x.l).toLowerCase())}"${x.disabled ? " disabled" : ""}>
+        <span class="drow"><span>${esc(x.l)}</span>${sel(x) ? TICK : ""}</span>${x.sub ? `<span class="small">${esc(x.sub)}</span>` : ""}</button>`).join("")}
       <div class="small anone" hidden style="padding:10px 12px">No match.</div></div></div>` : ""}</span>`;
 }
 function ddPick(id, v) {
-  S.dd = null;
   const [kind, arg] = id.split(":");
+  if (kind === "mco") {
+    const a = agent(arg);
+    if (v === "__all") a.mcos = []; else a.mcos = a.mcos.includes(v) ? a.mcos.filter(x => x !== v) : [...a.mcos, v];
+    if (a.mcos.length === MCOS.length) a.mcos = [];
+    return render();
+  }
+  S.dd = null;
   if (kind === "assign") { const t = byKey(arg); t.assignedTo = v; toast(`Assigned to ${agent(v).name}. Only they see it now, at the top of their list.`); }
   if (kind === "sla") { S.types[arg].due = v; toast(`New ${S.types[arg].name} tasks are now due within ${v}.`); }
   if (kind === "msort") S.msort = v;
@@ -1124,22 +1255,29 @@ const SLAS = ["2 min","15 min","1 h","2 h","4 h","1 d","2 d","5 d"];
 const SHORT = {cmn:"Call me now", inbound:"Inbound", sms:"SMS", fmco:"First MCO", escalation:"Escalation", pson:"PSON", auth:"Auth", never:"Never contacted"};
 const mins = t => Math.max(0, Math.round((Date.now() - t.heldAt) / 60000));
 
+const PIN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>`;
+const GRIP = `<svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="9" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="9" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="9" cy="13" r="1.3"/></svg>`;
 function mqList() {
   const u = urgentTask(), m = missed().length, nNever = agentsFor("never");
   const row = (id, label, sub, count, cls = "", tone = "neutral") => `<button class="qitem mq ${S.mq === id ? "active" : ""}" data-act="mq" data-v="${id}">
-    <span class="qbody"><span class="qtitle">${label}</span><span class="small ${cls}">${sub}</span></span><span class="badge ${tone}">${count}</span></button>`;
+    <span class="qbody"><span class="qtitle">${label}</span><span class="small ${cls}">${sub}</span></span>${count === null ? "" : `<span class="badge ${tone}">${count}</span>`}</button>`;
   let h = "";
   if (u) h += alertCard({tone:"red", icon:"bolt", label:"Call me now, nobody has claimed it", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
     name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`]});
+  h += row("today", "Today", "Alarms, queue load and who’s working", null);
   h += `<div class="ghead">Needs attention</div>`;
   h += row("missed", "Missed scheduled calls", m ? "A caregiver booked a time, nobody called" : "Every booked call was made", m, m ? "late" : "", m ? "red" : "green");
   h += row("never", "Never contacted", nNever ? `${nNever} agent${nNever > 1 ? "s" : ""} on it` : "Nobody works this queue", 217, nNever ? "" : "late", "red");
   h += row("pastdue", "Past due", "All task types, oldest first", 40, "", "amber");
-  h += `<div class="ghead">Task types<span>by priority</span></div>`;
-  [...TYPE_ORDER].filter(k => k !== "never").sort((a, b) => S.types[b].p - S.types[a].p).forEach(k => {
+  h += `<div class="ghead">Task types<span>most important first</span></div>`;
+  h += `<div class="qitem mq fixedrow"><span class="grip off" aria-hidden="true"></span><span class="rank pin" title="Always first">${PIN}</span><span class="qbody"><span class="qtitle">Call me now</span><span class="small">Always first</span></span><span class="badge muted">0</span></div>`;
+  S.order.forEach((k, i) => {
     const ty = S.types[k], [o, p] = ty.stats;
-    h += row(k, ty.name, `${ty.fixed ? "Always first" : "Priority P" + ty.p}${p ? ` <span class="badge red xs">${p} past due</span>` : ""}`, o || "0", "", o ? "neutral" : "muted");
+    h += `<div class="qitem mq drag ${S.mq === k ? "active" : ""}" draggable="true" data-drag="${k}" tabindex="0" role="button" data-act="mq" data-v="${k}" aria-label="${ty.name}, rank ${i + 1} of ${S.order.length}. Alt plus arrow keys to move.">
+      <span class="grip" aria-hidden="true">${GRIP}</span><span class="rank">${i + 1}</span>
+      <span class="qbody"><span class="qtitle">${ty.name}</span>${p ? `<span class="small"><span class="badge red xs" style="margin-left:0">${p} past due</span></span>` : ""}</span><span class="badge ${o ? "neutral" : "muted"}">${o || 0}</span></div>`;
   });
+  h += `<div class="draghint">Drag to reorder. Higher means more important for every agent.</div>`;
   return h;
 }
 function taskTable(rows, foot) {
@@ -1148,7 +1286,7 @@ function taskTable(rows, foot) {
     ${rows.length ? rows.map(t => { const s = mgrState(t); return `<tr>
       <td class="casecell"><div class="qtitle">${esc(t.patient)}</div><div class="small">${ml(t.id, esc(t.mco), S.types[S.mq] ? "" : SHORT[t.type])}</div><div class="reason ${s.cls}">${s.text}</div></td>
       <td class="small">${t.pauses || t.releases ? [t.pauses ? `${t.pauses} paused` : "", t.releases ? `${t.releases} released` : ""].filter(Boolean).join("<br>") : "None yet"}</td>
-      <td>${t.status === "open" && !t.assignedTo && !S.types[t.type].fixed ? `<span class="stepper sm ${t.pOver != null ? "over" : ""}"><button data-act="tpri" data-key="${t.key}" data-v="-1" aria-label="Lower priority for ${esc(t.patient)}">−</button><b>P${pri(t)}</b><button data-act="tpri" data-key="${t.key}" data-v="1" aria-label="Raise priority for ${esc(t.patient)}">+</button></span>${t.pOver != null ? `<button class="resetbtn3" data-act="tpreset" data-key="${t.key}" title="Reset to P${S.types[t.type].p}, the type's priority" aria-label="Reset ${esc(t.patient)} to P${S.types[t.type].p}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>` : ""}` : `<span class="small">P${pri(t)}</span>`}</td>
+      <td>${t.status === "open" && !t.assignedTo && !S.types[t.type].fixed ? `<span class="stepper sm ${t.pOver != null ? "over" : ""}"><button data-act="tpri" data-key="${t.key}" data-v="-1" aria-label="Lower priority for ${esc(t.patient)}">−</button><b>${t.pOver == null ? "Type" : (t.pOver > S.types[t.type].p ? "+" : "") + (t.pOver - S.types[t.type].p)}</b><button data-act="tpri" data-key="${t.key}" data-v="1" aria-label="Raise priority for ${esc(t.patient)}">+</button></span>${t.pOver != null ? `<button class="resetbtn3" data-act="tpreset" data-key="${t.key}" title="Back to the type's place in the order" aria-label="Reset ${esc(t.patient)} to the type's priority"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>` : ""}` : `<span class="small">P${pri(t)}</span>`}</td>
       <td class="right">${t.status === "open" && !t.assignedTo ? `
         ${dd({id:`assign:${t.key}`, placeholder:"Assign to…", aria:`Assign ${t.patient} to`, search:true, options:S.agents.filter(a => a.on).map(a => ({v:a.id, l:a.name, sub:a.types.map(x => SHORT[x]).join(", ")}))})}` : ""}</td></tr>`; }).join("")
       : `<tr><td colspan="4" class="small" style="padding:24px 14px">Nothing here right now.</td></tr>`}
@@ -1168,14 +1306,14 @@ function typeCenter(k) {
   if (f === "missed") rows = rows.filter(t => t.sched != null && t.sched <= NOW);
   if (f === "never") rows = rows.filter(t => !t.attempts);
   rows.sort((a, b) => (S.msort === "oldest" || f === "oldest") ? a.created - b.created : a.due - b.due);
-  const stepper = ty.fixed ? `<span class="small">Always first</span>` : `<span class="stepper labeled"><span class="fl">Priority</span><button data-act="pri" data-k="${k}" data-v="-1" aria-label="Lower priority">−</button><b>P${ty.p}</b><button data-act="pri" data-k="${k}" data-v="1" aria-label="Raise priority">+</button></span>`;
+  const stepper = ty.fixed ? `<span class="small">Always first</span>` : `<span class="stepper labeled"><span class="fl">Rank</span><button data-act="rank" data-k="${k}" data-v="-1" aria-label="Move up" ${rankOf(k) === 1 ? "disabled" : ""}>↑</button><b>${rankOf(k)} of ${S.order.length}</b><button data-act="rank" data-k="${k}" data-v="1" aria-label="Move down" ${rankOf(k) === S.order.length ? "disabled" : ""}>↓</button></span>`;
 
   const dueSel = k === "inbound" ? `<span class="small">Due within: live</span>` : dd({id:`sla:${k}`, label:"Due within", value:ty.due, options:SLAS.map(s => ({v:s, l:s}))});
   return `<div class="crumbs"><span class="small">${ml("Queues", ty.name)}</span><span class="grow"></span>${dueSel}<span class="vsep"></span>${stepper}</div>
-  <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every free agent the moment it arrives." : "Raising the priority lifts it in every eligible agent's list at once."}</p>
+  <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every free agent the moment it arrives." : "Moving it up lifts it in every eligible agent's list at once."}</p>
     <h3 class="sh">Who works this queue <span class="badge ${workers.length ? "neutral" : "red"} hb">${workers.length}</span></h3>
     ${workers.length ? "" : `<div class="empty-line late" style="margin-bottom:10px">Nobody works this queue. These tasks won't reach anyone until you add an agent.</div>`}
-    <div class="tokens">${workers.map(a => `<span class="token">${a.name}<button data-act="ttype" data-a="${a.id}" data-k="${k}" aria-label="Remove ${a.name} from ${ty.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>`).join("")}
+    <div class="tokens">${workers.map(a => `<span class="token">${a.name}${a.mcos && a.mcos.length ? `<span class="tmco">${mcoLabel(a)}</span>` : ""}<button data-act="ttype" data-a="${a.id}" data-k="${k}" aria-label="Remove ${a.name} from ${ty.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>`).join("")}
       <span class="apick"><button class="btn sm" data-act="agentpick" aria-expanded="${!!S.agentPick}">+ Add agent</button>
       ${S.agentPick ? `<div class="apop" role="dialog" aria-label="Add agent"><input type="search" data-agentq placeholder="Search agents" aria-label="Search agents" autocomplete="off">
         <div class="aopts">${S.agents.filter(a => !a.types.includes(k)).sort((x, y) => (y.on - x.on) || x.name.localeCompare(y.name)).map(a =>
@@ -1190,9 +1328,9 @@ function typeCenter(k) {
     ${taskTable(rows, rows.length && o > rows.length ? `Showing ${rows.length} of ${o} in this prototype` : "")}</div>`;
 }
 function liveCol() {
-  const typeView = S.types[S.mq] != null;
+  const typeView = S.types[S.mq] != null, isToday = S.mq === "today";
   const viewTypes = typeView ? [S.mq] : [...new Set((S.mq === "missed" ? missed() : S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null)).map(t => t.type))];
-  const scoped = S.liveScope !== "all";
+  const scoped = !isToday && S.liveScope !== "all";
   const pool = S.agents.filter(a => !scoped || a.types.some(x => viewTypes.includes(x)));
   const info = a => {
     if (a.id === "jasmine") { const t = S.held && byKey(S.held); return t ? {txt:`${SHORT[t.type]}, ${esc(t.patient)}`, m:mins(t)} : {txt:"Nothing claimed"}; }
@@ -1201,7 +1339,7 @@ function liveCol() {
   const rank = a => { const i = info(a); if (i.m >= 30) return 0; if (i.m == null && /nothing/i.test(i.txt)) return 1; return 2; };
   const on = pool.filter(a => a.on).sort((x, y) => rank(x) - rank(y) || x.name.localeCompare(y.name));
   const off = pool.filter(a => !a.on);
-  const seg = `<div class="seg2 live-seg" role="group" aria-label="Whose activity to show">
+  const seg = isToday ? "" : `<div class="seg2 live-seg" role="group" aria-label="Whose activity to show">
     <button aria-pressed="${scoped}" data-act="livescope" data-v="queue">This queue</button><button aria-pressed="${!scoped}" data-act="livescope" data-v="all">Everyone</button></div>`;
   return `<section class="psec ${pc("live")}">${phead("live","Right now")}<div class="pbody">${seg}
     ${on.length ? on.map(a => { const l = info(a), r = rank(a); return `<div class="live">
@@ -1210,8 +1348,32 @@ function liveCol() {
       : `<div class="small" style="padding:8px 0">Nobody working today is set up for this.</div>`}</div></section>
     ${off.length ? `<section class="psec ${pc("out")}">${phead("out","Out")}<div class="pbody">${off.map(a => `<div class="small outline">${a.name}, ${(a.outUntil || "Out today").replace("Out ", "").replace("today", "today only")}</div>`).join("")}</div></section>` : ""}`;
 }
+function todayCenter() {
+  const m = missed(), nNever = agentsFor("never");
+  const card = (v, n, tone, label, sub) => `<button class="card3" data-act="mq" data-v="${v}"><span class="badge xl ${n ? tone : "muted"}">${n}</span><span class="c-l">${label}</span><span class="c-s">${sub}</span></button>`;
+  const rows = ["cmn", ...S.order].map((k, i) => { const ty = S.types[k], [o, p, old] = ty.stats, n = agentsFor(k);
+    return `<tr class="clickrow" data-act="mq" data-v="${k}"><td><span class="rank ${k === "cmn" ? "pin" : ""}">${k === "cmn" ? PIN : i}</span></td>
+      <td><div class="qtitle">${ty.name}</div><div class="lr-bar"><span style="width:${Math.max(o ? 3 : 0, Math.round(o / 217 * 100))}%"></span>${p ? `<span class="lr-late" style="width:${Math.round(p / 217 * 100)}%"></span>` : ""}</div></td>
+      <td class="num">${o}</td><td>${p ? `<span class="badge red xs" style="margin:0">${p} past due</span>` : `<span class="small">On time</span>`}</td>
+      <td class="small ${n ? "" : "late"}">${n ? `${n} agent${n > 1 ? "s" : ""}` : "No agents"}</td><td class="small">${old}</td></tr>`; }).join("");
+  return `<div class="crumbs"><span class="small">${ml("Queues", "Today")}</span></div><div class="detail wide">
+    <h1>Today</h1><p class="lead">What needs attention, how loaded each queue is, and who is working on what.</p>
+    <div class="cards cards3">${card("missed", m.length, "red", "Missed calls", m.length ? `${m[0].patient}, ${dur(NOW - m[0].sched)} late` : "All calls made")}${card("never", 217, "red", "Never contacted", nNever ? `Rank ${rankOf("never")} of ${S.order.length}` : "No agents on it")}${card("pastdue", 40, "amber", "Past due", "All task types")}</div>
+    <h3 class="sh">Queue load <span class="small" style="font-weight:400">in priority order</span></h3>
+    <div class="table-wrap"><table class="loadtable"><thead><tr><th style="width:44px"></th><th>Task type</th><th class="num">Open</th><th>Past due</th><th>Agents</th><th>Oldest</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+function teamNow() {
+  const info = a => {
+    if (a.id === "jasmine") { const t = S.held && byKey(S.held); return t ? {txt:`${SHORT[t.type]}, ${esc(t.patient)}`, m:mins(t)} : {txt:"Nothing claimed"}; }
+    return a.mins != null ? {txt:esc(a.now), m:a.mins} : {txt:esc(a.now)};
+  };
+  const rank = a => { const i = info(a); if (i.m >= 30) return 0; if (i.m == null && /nothing/i.test(i.txt)) return 1; return 2; };
+  const on = S.agents.filter(a => a.on).sort((x, y) => rank(x) - rank(y) || x.name.localeCompare(y.name)), off = S.agents.filter(a => !a.on);
+  return `<div class="nowlist">${on.map(a => { const l = info(a), r = rank(a); return `<div class="nowrow"><div class="nw-top"><span class="nw-name">${a.name}</span>${r === 0 ? `<span class="tag warn">Held a while</span>` : r === 1 ? `<span class="tag">Free</span>` : ""}</div><span class="small">${l.txt}${l.m != null ? `, ${l.m} min` : ""}</span></div>`; }).join("")}
+    ${off.length ? `<div class="nowrow off"><span class="small">Out: ${off.map(a => `${a.name} (${(a.outUntil || "Out today").replace("Out ", "")})`).join(", ")}</span></div>` : ""}</div>`;
+}
 function queuesPage() {
-  const c = S.mq === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
+  const c = S.mq === "today" ? todayCenter() : S.mq === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
     : S.mq === "pastdue" ? viewCenter("Past due", "Across all task types, oldest first.", S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null).sort((a, b) => a.due - b.due), "Showing a sample of 40")
     : typeCenter(S.mq);
   return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">Needs attention first, then by priority</span></div><div class="qscroll">${mqList()}</div></aside>
@@ -1223,17 +1385,18 @@ function usersPage() {
   return `<div class="mgr">
   <div class="utool"><label class="usearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
     <input type="search" data-usearch placeholder="Search agents" aria-label="Search agents" autocomplete="off"></label>
-    <span class="small">Tick what each person works today. They only see those task types.</span></div>
-  <div class="table-wrap"><table class="matrix"><thead><tr><th>Agent</th>${TYPE_ORDER.map(k => `<th class="c">${SHORT[k]}</th>`).join("")}<th class="num">Worked</th><th class="num">Closed</th></tr></thead><tbody>
+    <span class="small">Tick what each person works today and pick their MCOs. They only see those tasks.</span></div>
+  <div class="table-wrap"><table class="matrix"><thead><tr><th>Agent</th><th>MCOs</th>${TYPE_ORDER.map(k => `<th class="c">${SHORT[k]}</th>`).join("")}<th class="num">Worked</th><th class="num">Closed</th><th class="num" title="Tasks claimed ahead of the queue order today">Out of order</th></tr></thead><tbody>
   ${S.agents.map(a => {
-    const warn = !a.on ? "" : a.types.includes("inbound") && a.yesterday.includes("inbound") ? "On inbound yesterday too" : same(a.types, a.yesterday) && a.types.length > 1 ? "Same work as yesterday" : "";
+    const warn = !a.on ? "" : a.types.includes("inbound") && a.yesterday.includes("inbound") ? "On inbound yesterday too" : a.mcos.length && same(a.mcos, a.ymcos) ? "Same MCO as yesterday" : same(a.types, a.yesterday) && a.types.length > 1 ? "Same work as yesterday" : "";
     return `<tr class="${a.on ? "" : "off"}" data-uname="${a.name.toLowerCase()}"><td><div class="agent"><button class="toggle" aria-pressed="${a.on}" aria-label="${a.name} working today" data-act="onoff" data-a="${a.id}"></button>
       <div class="acell"><div class="qtitle">${a.name}</div>${a.on ? `<div class="small">${warn ? `<span class="warnline">${warn}</span>` : "Working"}</div>` : dd({id:`out:${a.id}`, value:a.outUntil || "Out today", small:true, options:["Out today","Out until Fri, Oct 2","Out until Mon, Oct 12"].map(o => ({v:o, l:o}))})}</div></div></td>
+      <td>${a.on ? dd({id:`mco:${a.id}`, multi:true, value:a.mcos, display:mcoLabel(a), aria:`MCOs ${a.name} works`, options:[{v:"__all", l:"All MCOs"}, ...MCOS.map(m => ({v:m, l:m, sub:a.ymcos.includes(m) ? "Worked it yesterday" : ""}))]}) : `<span class="small">—</span>`}</td>
       ${TYPE_ORDER.map(k => `<td class="c"><button class="cbx" role="checkbox" aria-checked="${a.types.includes(k)}" data-act="ttype" data-a="${a.id}" data-k="${k}" ${a.on ? "" : "disabled"} aria-label="${a.name} works ${S.types[k].name}">${a.types.includes(k) ? tick : ""}</button></td>`).join("")}
-      <td class="num">${a.worked}</td><td class="num">${a.closed}</td></tr>`;
+      <td class="num">${a.worked}</td><td class="num">${a.closed}</td><td class="num">${a.ooo ? `<span class="badge amber hb">${a.ooo}</span>` : `<span class="small">0</span>`}</td></tr>`;
   }).join("")}
-  <tr class="nomatch" hidden><td colspan="${TYPE_ORDER.length + 3}" class="small" style="padding:20px 14px">No agent matches.</td></tr>
-  <tr class="totals"><td class="small">Agents on each</td>${TYPE_ORDER.map(k => { const n = agentsFor(k); return `<td class="c"><span class="badge ${n ? "neutral" : "red"} hb">${n}</span></td>`; }).join("")}<td></td><td></td></tr>
+  <tr class="nomatch" hidden><td colspan="${TYPE_ORDER.length + 5}" class="small" style="padding:20px 14px">No agent matches.</td></tr>
+  <tr class="totals"><td class="small">Agents on each</td><td></td>${TYPE_ORDER.map(k => { const n = agentsFor(k); return `<td class="c"><span class="badge ${n ? "neutral" : "red"} hb">${n}</span></td>`; }).join("")}<td></td><td></td><td></td></tr>
   </tbody></table></div></div>`;
 }
 // ---------- shell ----------
@@ -1248,17 +1411,19 @@ const NAVI = {
   cases:['','<path d="M20 20a2 2 0 002-2V8a2 2 0 00-2-2h-7.9a2 2 0 01-1.7-.9L9.6 3.9A2 2 0 007.9 3H4a2 2 0 00-2 2v13a2 2 0 002 2z"/>'],
   patients:['','<circle cx="12" cy="8" r="4.5"/><path d="M20 21a8 8 0 00-16 0"/>'],
   caregivers:['','<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0016.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4 3 5.5l7 7z"/>'],
+  today:['','<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'],
   queues:['','<path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>'],
   users:['','<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>']
 };
 const navIcon = id => `<svg class="nicon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[id][1]}</svg>`;
 function render() {
+  if (S.view === "today") { S.view = "queues"; S.mq = "today"; }
   const agentSide = !["queues","users"].includes(S.view);
   const q = queue();
   const nav = (id, label, extra) => `<button class="nav ${S.view === id ? "on" : ""}" data-act="nav" data-v="${id}" title="${label}" aria-label="${label}">${navIcon(id)}<span class="nlabel">${label}</span><span class="ncount">${extra ?? ""}</span></button>`;
-  const title = {tasks:"My Tasks", queues:"Queues", users:"Users", all:"All Tasks", cases:"Cases", patients:"Patients", caregivers:"Caregivers"}[S.view];
+  const title = {tasks:"My Tasks", today:"Today", queues:"Queues", users:"Users", all:"All Tasks", cases:"Cases", patients:"Patients", caregivers:"Caregivers"}[S.view];
   const who = agentSide ? "Jasmine Okafor, Enrollment" : "Kelsey Anderson, Enrollment manager";
-  const center = S.view === "tasks" ? agentPage() : S.view === "queues" ? queuesPage() : S.view === "users" ? usersPage()
+  const center = S.view === "tasks" ? agentPage() : S.view === "today" ? todayPage() : S.view === "queues" ? queuesPage() : S.view === "users" ? usersPage()
     : `<div class="placeholder"><p class="lead">${title} works as it does in MC today. It's here so you can see the Call me now alert follow the agent anywhere in the product.</p></div>`;
   const u = urgentTask();
   const float = u && agentSide && S.view !== "tasks" && me().types.includes("cmn") ? `<div class="floatcard">${alertCard({tone:"red", icon:"bolt", label:"Call me now", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
@@ -1271,8 +1436,8 @@ function render() {
       ${NAV.map(([id, l, x]) => nav(id, l, id === "tasks" ? q.length + (S.held ? 1 : 0) : x)).join("")}
       <div class="navh"><span>Manage</span></div>${nav("queues", "Queues", alerts || "")}${nav("users", "Users")}</nav>
     <div class="mainwrap"><header class="pagebar"><h1>${title}</h1>
-      ${S.view === "tasks" ? `<span class="pill">${q.length} to claim</span>` : ""}<span class="grow"></span><span class="small">${who}</span>${hasProps ? `<button class="iconbtn navtoggle" data-act="toggleprops" aria-label="${S.propsOpen ? "Collapse" : "Expand"} details panel" title="${S.propsOpen ? "Collapse" : "Expand"} details panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M15 4v16"/>${S.propsOpen ? '<path d="M8.5 10l2 2-2 2"/>' : '<path d="M10.5 10l-2 2 2 2"/>'}</svg></button>` : ""}</header>
-      <div class="body ${S.propsOpen ? "" : "props-closed"}">${center}</div></div></div>
+      ${S.view === "tasks" ? `<span class="pill">${q.length} to claim</span>` : ""}<span class="grow"></span><span class="small">${who}</span>${hasProps ? `<button class="iconbtn navtoggle" data-act="toggleprops" aria-label="${propsOpen() ? "Collapse" : "Expand"} details panel" title="${propsOpen() ? "Collapse" : "Expand"} details panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M15 4v16"/>${propsOpen() ? '<path d="M8.5 10l2 2-2 2"/>' : '<path d="M10.5 10l-2 2 2 2"/>'}</svg></button>` : ""}</header>
+      <div class="body ${propsOpen() ? "" : "props-closed"}">${center}</div></div></div>
     <div class="switcher" role="group" aria-label="Prototype controls">
       <button aria-pressed="${agentSide}" data-act="nav" data-v="tasks">Agent view</button>
       <button aria-pressed="${!agentSide}" data-act="nav" data-v="queues">Manager view</button>
@@ -1352,10 +1517,12 @@ document.addEventListener("click", e => {
     if (S.demo && !e.target.closest(".pop")) { S.demo = false; render(); }
     else if (S.agentPick && !e.target.closest(".apick")) { S.agentPick = false; render(); }
     else if (S.dd && !e.target.closest(".dd")) { S.dd = null; render(); }
+    else if (S.ooo && !e.target.closest(".ooowrap")) { S.ooo = null; render(); }
     return;
   }
   if (S.agentPick && !b.closest(".apick") && b.dataset.act !== "agentpick") S.agentPick = false;
   if (S.dd && !b.closest(".dd")) S.dd = null;
+  if (S.ooo && !b.closest(".ooowrap") && act !== "claim") S.ooo = null;
   const {act, v, key, k, a} = b.dataset;
   if (b.tagName === "SELECT") return;
   if (b.type === "checkbox") { const ag = agent(b.dataset.a); ag.types = b.checked ? [...ag.types, b.dataset.k] : ag.types.filter(x => x !== b.dataset.k); return render(); }
@@ -1367,7 +1534,7 @@ document.addEventListener("click", e => {
     case "demo": S.demo = !S.demo; break;
     case "sc":
       S.demo = false;
-      if (v === "reset") { S = init(); break; }
+      if (v === "reset") { S = init(); applyOrder(); break; }
       if (v === "cmn" && !urgentTask()) setTimeout(() => { const u = urgentTask(); if (u) alertOutside(u, false); }, 50), S.tasks.push(Object.assign(T(1488, "Walter Marsh", "Delia Marsh", "daughter", "(512) 555-0182", "cmn", "Molina", {due:NOW + 2, created:20260928, note:"Asked to be called now from the website"}), {createdMs:Date.now()}));
       if (v === "heads") { const h = S.tasks.find(t => t.patient === "Hector Vela"); if (h.status === "open") { h.sched = NOW + 5; h.due = h.sched; } }
       if (v === "idle") {
@@ -1385,12 +1552,14 @@ document.addEventListener("click", e => {
       }
       if (v === "collide") { S.collide = true; toast("Next time you press Claim next, Devon claims that task a moment before you."); }
       break;
-    case "sel": if (!S.held) { S.sel = key; S.result = null; } else if (key !== S.held) toast("Finish or release your current task first."); break;
+    case "sel": if (!S.held) { S.sel = key; S.result = null; S.ooo = null; } else if (key !== S.held) toast("Finish or release your current task first."); break;
     case "next": return takeNext();
     case "claim": return claim(key);
     case "togglenav": S.navOpen = !S.navOpen; break;
-    case "toggleprops": S.propsOpen = !S.propsOpen; break;
-    case "claimgo": S.view = "tasks"; return claim(key);
+    case "toggleprops": if (S.view === "tasks") S.propsAgent = !S.propsAgent; else S.propsMgr = !S.propsMgr; break;
+    case "claimgo": S.view = "tasks"; return claim(key, {force:true});
+    case "oooreason": S.ooo.reason = v; break;
+    case "oooconfirm": return claim(S.ooo.key, {force:true, reason:S.ooo.reason});
     case "skipback": S.offerBack = null; break;
     case "notifon": chime(false); if (canNotify()) { try { Notification.requestPermission().then(p => { if (p !== "granted") toast("Desktop alerts are blocked in this browser. You'll still get the sound and the tab counter."); render(); }); } catch (e) {} } S.notifDismissed = true; break;
     case "notifno": S.notifDismissed = true; break;
@@ -1414,10 +1583,12 @@ document.addEventListener("click", e => {
       const t = byKey(key), base = S.types[t.type].p, before = pri(t);
       const n = Math.min(10, Math.max(1, before + +v));
       t.pOver = n === base ? null : n;
-      if (n > before && raised(t)) { S.notice = t.key; toast(`${t.patient} is now P${n}. Agents who work ${tname(t.type)} get a notification.`); }
+      if (n > before && raised(t)) { S.notice = t.key; toast(`${t.patient} now sorts above other ${tname(t.type)} tasks. Agents who work it get a notification.`); }
       else if (!raised(t) && S.notice === t.key) S.notice = null;
       break;
     }
+    case "gotoq": S.view = "queues"; S.mq = v; S.mfilter = "all"; break;
+    case "rank": { moveType(k, S.order.indexOf(k) + +v); break; }
     case "tpreset": { const t = byKey(key); t.pOver = null; if (S.notice === t.key) S.notice = null; break; }
     case "onoff": { const ag = agent(a); ag.on = !ag.on; break; }
     case "ttype": { const ag = agent(a); ag.types = ag.types.includes(k) ? ag.types.filter(x => x !== k) : [...ag.types, k]; break; }
@@ -1457,10 +1628,18 @@ document.addEventListener("input", e => {
   }
   if (e.target.matches("[data-grow]")) grow(e.target); const k = e.target.dataset.cap; if (k) { S.capture[k] = e.target.value; S.touched = true; } });
 document.addEventListener("toggle", e => { if (e.target.matches("[data-sop]")) S.sopOpen = e.target.open; }, true);
+let dragKey = null;
+document.addEventListener("dragstart", e => { const d = e.target.closest && e.target.closest("[data-drag]"); if (!d) return; dragKey = d.dataset.drag; d.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", dragKey); } catch (x) {} });
+document.addEventListener("dragover", e => { const d = e.target.closest && e.target.closest("[data-drag]"); if (!d || !dragKey) return; e.preventDefault(); document.querySelectorAll(".dropabove,.dropbelow").forEach(x => x.classList.remove("dropabove","dropbelow")); const r = d.getBoundingClientRect(); d.classList.add(e.clientY < r.top + r.height / 2 ? "dropabove" : "dropbelow"); });
+document.addEventListener("drop", e => { const d = e.target.closest && e.target.closest("[data-drag]"); if (!d || !dragKey) return; e.preventDefault(); const r = d.getBoundingClientRect(); let to = S.order.indexOf(d.dataset.drag) + (e.clientY < r.top + r.height / 2 ? 0 : 1); if (S.order.indexOf(dragKey) < to) to--; moveType(dragKey, to); dragKey = null; render(); });
+document.addEventListener("dragend", () => { dragKey = null; document.querySelectorAll(".dragging,.dropabove,.dropbelow").forEach(x => x.classList.remove("dragging","dropabove","dropbelow")); });
 document.addEventListener("scroll", e => { if (S.dd && !(e.target.closest && e.target.closest(".ddpop"))) { S.dd = null; render(); } }, true);
 addEventListener("resize", () => { if (S.dd) { S.dd = null; render(); } });
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && (S.agentPick || S.dd)) { S.agentPick = false; S.dd = null; render(); return; }
+  const dr = e.target.closest && e.target.closest("[data-drag]");
+  if (dr && e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) { e.preventDefault(); const k = dr.dataset.drag; moveType(k, S.order.indexOf(k) + (e.key === "ArrowUp" ? -1 : 1)); render(); document.querySelector(`[data-drag="${k}"]`)?.focus(); return; }
+  if (dr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); dr.click(); return; }
+  if (e.key === "Escape" && (S.agentPick || S.dd || S.ooo)) { S.agentPick = false; S.dd = null; S.ooo = null; render(); return; }
   if (e.target.closest("input,textarea,select") || e.metaKey || e.ctrlKey || e.altKey || S.view !== "tasks") return;
   const key = e.key.toLowerCase();
   if (key === "n" && !S.held && !(urgentTask() && me().types.includes("cmn"))) { e.preventDefault(); takeNext(); }
