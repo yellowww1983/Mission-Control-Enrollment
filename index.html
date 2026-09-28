@@ -716,6 +716,10 @@ body{background:#F4F3F1}
 .tag.blue{background:#E8EEFB;color:#1A46A3}
 .crumblink{color:var(--muted);text-decoration:none;font-size:12.5px}.crumblink:hover{color:var(--ink);text-decoration:underline}
 .clink{cursor:default}.clink:hover{border-color:var(--line);background:#fff}
+.otherpage{max-width:760px;margin:0 auto;padding:36px 32px;display:flex;flex-direction:column;gap:14px}
+.otherpage .small{margin:0 0 10px}
+.skel{display:block;height:10px;border-radius:5px;background:#EEECE8;max-width:100%}
+.floatcard{top:calc(76px + env(safe-area-inset-top,0px));right:24px}
 </style>
 </head>
 <body>
@@ -1416,14 +1420,14 @@ const NAVI = {
 const navIcon = id => `<svg class="nicon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[id][1]}</svg>`;
 function render() {
   if (S.view === "today") { S.view = "queues"; S.mq = "today"; }
-  if (!["tasks","queues","users"].includes(S.view)) S.view = "tasks";
+  if (!["tasks","queues","users","cases"].includes(S.view)) S.view = "tasks";
   const agentSide = !["queues","users"].includes(S.view);
   const q = queue();
   const nav = (id, label, extra) => `<button class="nav ${S.view === id ? "on" : ""}" data-act="nav" data-v="${id}" title="${label}" aria-label="${label}">${navIcon(id)}<span class="nlabel">${label}</span><span class="ncount">${extra ?? ""}</span></button>`;
   const title = {tasks:"My Tasks", today:"Today", queues:"Queues", users:"Users", all:"All Tasks", cases:"Cases", patients:"Patients", caregivers:"Caregivers"}[S.view];
   const who = agentSide ? "Jasmine Okafor, Enrollment" : "Kelsey Anderson, Enrollment manager";
   const center = S.view === "tasks" ? agentPage() : S.view === "today" ? todayPage() : S.view === "queues" ? queuesPage() : S.view === "users" ? usersPage()
-    : `<div class="placeholder"><p class="lead">${title} works as it does in MC today. It's here so you can see the Call me now alert follow the agent anywhere in the product.</p></div>`;
+    : `<div class="otherpage"><p class="small">Any other Mission Control page, shown here only to demo the Call me now alert following the agent. <button class="linkbtn" data-act="nav" data-v="tasks">Back to My Tasks</button></p>${Array.from({length:6}, (_, i) => `<span class="skel" style="width:${420 - i * 40}px"></span>`).join("")}</div>`;
   const u = urgentTask();
   const float = u && agentSide && S.view !== "tasks" && me().types.includes("cmn") ? `<div class="floatcard">${alertCard({tone:"red", icon:"bolt", label:"Call me now", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
     name:esc(u.cg), meta:[u.id, u.mco, "First to claim gets it"], action:`<button class="btn primary sm" data-act="claimgo" data-key="${u.key}">Claim and open</button>`})}</div>` : "";
@@ -1445,6 +1449,7 @@ function render() {
       ${S.demo ? `<div class="pop">
         <button data-act="sc" data-v="cmn">A caregiver asks to be called now<small>Urgent task with a 2-minute countdown</small></button>
         <button data-act="sc" data-v="heads">A scheduled call is 5 minutes away<small>Heads-up before the booked time</small></button>
+        <button data-act="sc" data-v="away">Call me now while on another page<small>Floating alert outside My Tasks</small></button>
         <button data-act="sc" data-v="collide">Two agents claim the same task<small>Devon wins your next Claim next</small></button>
         <button data-act="sc" data-v="idle">Jasmine goes quiet for 5 minutes<small>Untouched claimed task returns to the pool</small></button>
         <button data-act="sc" data-v="wake">Paused tasks wake up<small>They come back open, for anyone</small></button>
@@ -1548,6 +1553,10 @@ document.addEventListener("click", e => {
         if (!p.length) { toast("Nothing is paused. Pause a task first (No answer or Call back later)."); break; }
         p.forEach(t => { t.status = "open"; t.pausedUntil = null; });
         toast(`${p.length} paused task${p.length > 1 ? "s are" : " is"} back in the pool, open to anyone, with the attempt count kept.`);
+      }
+      if (v === "away") {
+        if (!urgentTask()) { S.tasks.push(Object.assign(T(1488, "Walter Marsh", "Delia Marsh", "daughter", "(512) 555-0182", "cmn", "Molina", {due:NOW + 2, created:20260928, note:"Asked to be called now from the website"}), {createdMs:Date.now()})); setTimeout(() => { const u = urgentTask(); if (u) alertOutside(u, false); }, 50); }
+        S.view = "cases";
       }
       if (v === "collide") { S.collide = true; toast("Next time you press Claim next, Devon claims that task a moment before you."); }
       break;
