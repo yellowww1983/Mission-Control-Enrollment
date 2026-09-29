@@ -770,6 +770,11 @@ body{background:#F4F3F1}
 .sopfoot{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding-top:10px;border-top:1px solid var(--line)}
 .sopfoot .tasklink{margin-left:auto}
 .sopn{background:#fff;color:var(--ink);border:1px solid #CFCBC4}
+.plink.stack{display:grid;grid-template-columns:8px 1fr;column-gap:10px;row-gap:1px;align-items:center;padding:8px 0}
+.plink.stack .dot{grid-row:1}
+.plink.stack .pk{grid-column:2;font-size:12px;color:var(--muted)}
+.plink.stack .pv{grid-column:2;font-size:14px;overflow-wrap:anywhere;line-height:1.35}
+.plink.stack.last{border-bottom:0}
 </style>
 </head>
 <body>
@@ -1128,10 +1133,10 @@ function props() {
   if (!t) return `<div class="small" style="padding:20px">Select a task to see its context.</div>`;
   const sop = SOP[`${t.type}:${t.mco}`] || SOP[t.type] || [];
   const status = S.held === t.key ? "Claimed by you" : t.status === "open" ? "Open" : t.status;
-  const link = (c, k, v) => `<div class="plink"><span class="dot" style="background:${c}"></span><span class="ck">${k}</span>${esc(v)}</div>`;
+  const link = (c, k, v) => `<div class="plink stack"><span class="dot" style="background:${c}"></span><span class="pk">${k}</span><span class="pv">${esc(v)}</span></div>`;
   return `<section class="psec ${pc("case")}">${phead("case","Case")}<div class="pbody">
     ${link("#8B6CEF","Case",t.id)}${link("#D9534F","Patient",t.patient)}${link("#3B82F6","Caregiver",t.cg)}${link("#B7892E","MCO",t.mco)}
-    <div class="small" style="margin-top:8px">Step: ${tname(t.type)}</div></div></section>
+    <div class="plink stack last"><span class="dot" style="background:#8C867C"></span><span class="pk">Step</span><span class="pv">${tname(t.type)}</span></div></div></section>
     ${sop.length ? `<section class="psec ${pc("sop")}">${phead("sop","How to handle")}<div class="pbody"><div class="sophead"><span class="tag">${tname(t.type)}</span>${t.mco !== "Unknown" ? `<span class="tag">${esc(t.mco)}</span>` : ""}</div><ol class="sopsteps">${sop.map((s, i) => `<li><span class="sopn">${i + 1}</span><span class="soptxt">${esc(s)}</span></li>`).join("")}</ol><div class="sopfoot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg>Enrollment SOP<a href="#" class="tasklink" data-act="tasklink" data-v="The full SOP">Open full SOP</a></div></div></section>` : ""}
     <section class="psec ${pc("props")}">${phead("props","Properties")}<div class="pbody"><dl class="pdl">
     <dt>Status</dt><dd>${status}</dd>
