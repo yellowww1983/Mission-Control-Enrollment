@@ -897,7 +897,6 @@ function queue() {
   return out;
 }
 function reason(t) {
-  if (t.assignedTo === "jasmine") return {text:"Assigned to you by Kelsey", cls:"soon"};
   if (t.sched != null) {
     if (t.sched <= NOW) return {text:`Missed scheduled call at ${fmt(t.sched)}, ${dur(NOW - t.sched)} late`, cls:"late"};
     return {text:`Scheduled for ${fmt(t.sched)}, in ${t.sched - NOW} min`, cls:"soon"};
@@ -945,7 +944,11 @@ function queueCol() {
     note:S.held ? "Finish your current task to claim it." : "",
     action:S.held ? "" : `<button class="btn sm" data-act="claim" data-key="${soon.key}">Claim</button>`});
   const nt = S.notice && byKey(S.notice);
-  if (nt && raised(nt) && eligible(nt) && !S.held) h += alertCard({tone:"blue", icon:"up", label:"Raised by Kelsey", pill:"",
+  const at = S.assignNotice && byKey(S.assignNotice);
+  if (at && at.assignedTo === "jasmine" && at.status === "open" && !S.held) h += alertCard({tone:"blue", icon:"up", label:"Assigned to you by Kelsey", pill:"",
+    name:esc(at.patient), meta:[tname(at.type), at.id, at.mco],
+    action:`<button class="btn ghost sm" data-act="dismissassign">Dismiss</button><button class="btn sm" data-act="claim" data-key="${at.key}">Claim</button>`});
+  if (nt && raised(nt) && !nt.assignedTo && eligible(nt) && !S.held) h += alertCard({tone:"blue", icon:"up", label:"Raised by Kelsey", pill:"",
     name:esc(nt.patient), meta:[tname(nt.type), nt.id, nt.mco],
     action:`<button class="btn ghost sm" data-act="dismiss">Dismiss</button><button class="btn sm" data-act="claim" data-key="${nt.key}">Claim</button>`});
   if (S.offerBack) {
@@ -983,7 +986,7 @@ function qItem(t, n, active) {
     <span class="qbody"><span class="qtitle">${tname(t.type)}</span>
     <span class="small">${ml(t.id, esc(t.patient), esc(t.mco))}</span>
     <span class="reason ${mine ? "good" : r.cls}">${mine ? "Claimed by you" : r.text}</span>
-    ${raised(t) && !mine ? `<span class="tag blue">Raised by Kelsey</span>` : ""}${t.attempts && !mine ? `<span class="tag warn">Back in the pool, attempt ${t.attempts + 1}</span>` : ""}${t.blockedBy ? `<span class="tag">Blocked by ${esc(t.blockedBy.split(":")[0])}</span>` : ""}</span></button>`;
+    ${t.assignedTo === "jasmine" && !mine ? `<span class="tag blue">Assigned by Kelsey</span>` : raised(t) && !mine ? `<span class="tag blue">Raised by Kelsey</span>` : ""}${t.attempts && !mine ? `<span class="tag warn">Back in the pool, attempt ${t.attempts + 1}</span>` : ""}${t.blockedBy ? `<span class="tag">Blocked by ${esc(t.blockedBy.split(":")[0])}</span>` : ""}</span></button>`;
 }
 function crumbs(t, right) {
   return `<div class="crumbs"><span class="small">${ml("Enrollment", "Tasks", t ? t.id : "", t ? tname(t.type) : "")}</span><span class="grow"></span>${right || ""}</div>`;
@@ -1267,7 +1270,7 @@ function ddPick(id, v) {
     return render();
   }
   S.dd = null;
-  if (kind === "assign") { const t = byKey(arg); if (v === "__none") { t.assignedTo = null; toast(`${t.patient} is back in the pool.`); } else { t.assignedTo = v; toast(`Assigned to ${agent(v).name}. Only they see it now, at the top of their list.`); } }
+  if (kind === "assign") { const t = byKey(arg); if (v === "__none") { t.assignedTo = null; toast(`${t.patient} is back in the pool.`); } else { t.assignedTo = v; if (v === "jasmine") S.assignNotice = t.key; if (S.notice === t.key) S.notice = null; toast(`Assigned to ${agent(v).name}. Only they see it now, at the top of their list.`); } }
   if (kind === "sla") { S.types[arg].due = v; toast(`New ${S.types[arg].name} tasks are now due within ${v}.`); }
   if (kind === "msort") S.msort = v;
   if (kind === "out") agent(arg).outUntil = v;
@@ -1611,6 +1614,7 @@ document.addEventListener("click", e => {
     case "notifon": chime(false); if (canNotify()) { try { Notification.requestPermission().then(p => { if (p !== "granted") toast("Desktop alerts are blocked in this browser. You'll still get the sound and the tab counter."); render(); }); } catch (e) {} } S.notifDismissed = true; break;
     case "notifno": S.notifDismissed = true; break;
     case "dismiss": S.notice = null; break;
+    case "dismissassign": S.assignNotice = null; break;
     case "call": S.onCall = !S.onCall; S.touched = true; break;
     case "cap": S.capture[k] = v; S.err = null; S.touched = true; break;
     case "outcome": return outcome(v);
