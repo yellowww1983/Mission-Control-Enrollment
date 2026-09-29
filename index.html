@@ -748,6 +748,10 @@ body{background:#F4F3F1}
 .mq-body{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0}
 .mq-sub{display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mq-sub.small{display:block}
+.stepper.over b{color:var(--ink)}
+.qitem .qbody{padding-left:4px}
+.showmore{display:block;width:100%;height:40px;border:0;border-bottom:1px solid var(--line);background:#FAFAF9;color:var(--muted);font-size:13px;font-weight:500;text-align:center}
+.showmore:hover{background:#F2F1EF;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -917,7 +921,7 @@ function alertCard(o) {
 }
 
 function urgentTask() { return S.tasks.find(t => t.type === "cmn" && t.status === "open"); }
-const GROUPS = ["Assigned to you", "Late for a booked call", "Scheduled calls coming up", "Up next"];
+const GROUPS = ["Assigned to you", "Late for a booked call", "Scheduled calls coming up", "By priority"];
 function currentSel() {
   if (S.held) return byKey(S.held);
   const q = queue();
@@ -951,25 +955,30 @@ function queueCol() {
   const urgentOpen = !!(u && me().types.includes("cmn"));
   const bar = S.held ? `<div class="qbar"><span class="small">Finish or release this task to claim the next one</span></div>`
     : urgentOpen ? `<div class="qbar"><span class="small">Call me now comes first. Claim it below.</span></div>`
-    : `<div class="qbar"><button class="btn ${S.result ? "" : "primary"} sm" data-act="next" ${S.held || !q.length ? "disabled" : ""}>Claim next<kbd>N</kbd></button>
-    ${q.length ? `<span class="small nextup">Next: <b>${esc(q[0].patient)}</b>, ${tname(q[0].type)}</span>` : `<span class="small">Nothing to claim right now</span>`}</div>`;
+    : `<div class="qbar"><button class="btn ${S.result ? "" : "primary"} sm" data-act="next" ${S.held || !q.length ? "disabled" : ""}>Claim top task<kbd>N</kbd></button>
+    ${q.length ? `<span class="small nextup">Top priority: <b>${esc(q[0].patient)}</b></span>` : `<span class="small">Nothing to claim right now</span>`}</div>`;
   h = `<div class="qtop">${bar}${h}</div><div class="qscroll">`;
   if (S.held) {
     const t = byKey(S.held);
     h += `<div class="ghead">You're working</div>${qItem(t, "•", true)}`;
   }
   if (!q.length) h += `<div class="qempty">Nothing to claim right now. New tasks for your task types show up here as they're created.</div>`;
-  let g = -1;
-  q.forEach((t, i) => {
-    if (grp(t) !== g) { g = grp(t); h += `<div class="ghead">${GROUPS[g]}<span>${q.filter(x => grp(x) === g).length}</span></div>`; }
-    h += qItem(t, i + 1, !S.held && sel && sel.key === t.key);
+  const LIMIT = 5, exp = S.expanded || (S.expanded = {});
+  [0, 1, 2, 3].forEach(g => {
+    const items = q.filter(x => grp(x) === g);
+    if (!items.length) return;
+    h += `<div class="ghead">${GROUPS[g]}<span>${items.length}</span></div>`;
+    const selIdx = sel ? items.findIndex(x => x.key === sel.key) : -1;
+    const open = exp[g] || items.length <= LIMIT + 1 || selIdx >= LIMIT;
+    (open ? items : items.slice(0, LIMIT)).forEach(t => { h += qItem(t, 0, !S.held && sel && sel.key === t.key); });
+    if (items.length > LIMIT + 1) h += `<button class="showmore" data-act="showmore" data-v="${g}">${open ? "Show less" : `Show ${items.length - LIMIT} more`}</button>`;
   });
   return h + `</div>`;
 }
 function qItem(t, n, active) {
   const r = reason(t), mine = S.held === t.key;
   return `<button class="qitem ${active ? "active" : ""} ${mine ? "mine" : ""}" data-act="sel" data-key="${t.key}">
-    <span class="qn">${n}</span><span class="qbody"><span class="qtitle">${tname(t.type)}</span>
+    <span class="qbody"><span class="qtitle">${tname(t.type)}</span>
     <span class="small">${ml(t.id, esc(t.patient), esc(t.mco))}</span>
     <span class="reason ${mine ? "good" : r.cls}">${mine ? "Claimed by you" : r.text}</span>
     ${raised(t) && !mine ? `<span class="tag blue">Raised by Kelsey</span>` : ""}${t.attempts && !mine ? `<span class="tag warn">Back in the pool, attempt ${t.attempts + 1}</span>` : ""}${t.blockedBy ? `<span class="tag">Blocked by ${esc(t.blockedBy.split(":")[0])}</span>` : ""}</span></button>`;
@@ -1029,10 +1038,10 @@ function preview(t) {
   const blockedByHeld = S.held && t.type !== "cmn";
   const nextUp = queue()[0];
   const pop = S.ooo && S.ooo.key === t.key ? `<div class="ooopop" role="dialog" aria-label="Taking this out of order">
-    <strong>Taking this out of order?</strong>
-    <p>Next in line is ${esc(nextUp ? nextUp.patient : "")}${nextUp ? `, ${tname(nextUp.type)}` : ""}. Tell Kelsey why you're skipping it.</p>
+    <strong>Skipping the top priority?</strong>
+    <p>Top priority is ${esc(nextUp ? nextUp.patient : "")}${nextUp ? `, ${tname(nextUp.type)}` : ""}. Tell Kelsey why you're skipping it.</p>
     <div class="chips">${OOO_REASONS.map(r => `<button class="chip" aria-pressed="${S.ooo.reason === r}" data-act="oooreason" data-v="${esc(r)}">${esc(r)}</button>`).join("")}</div>
-    <div class="oooact"><button class="btn primary sm" data-act="oooconfirm" ${S.ooo.reason ? "" : "disabled"}>Claim anyway</button><button class="btn ghost sm" data-act="next">Take next in line instead</button></div></div>` : "";
+    <div class="oooact"><button class="btn primary sm" data-act="oooconfirm" ${S.ooo.reason ? "" : "disabled"}>Claim anyway</button><button class="btn ghost sm" data-act="next">Take top task instead</button></div></div>` : "";
   const right = blockedByHeld ? `<span class="small">Finish your current task to claim</span>` : `<span class="ooowrap"><button class="btn sm" data-act="claim" data-key="${t.key}" aria-expanded="${!!pop}">Claim this task<kbd>C</kbd></button>${pop}</span>`;
   return crumbs(t, right) + `<div class="detail"><h1>${tname(t.type)}</h1>
     <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>${caseLinks(t)}
@@ -1079,7 +1088,7 @@ function center() {
     const q = queue();
     return crumbs(null) + `<div class="detail"><div class="check">${checkSvg}</div><h1 style="margin-top:12px">${esc(S.result.title)}</h1>
       <ul class="lines">${S.result.lines.map(l => `<li>${l}</li>`).join("")}</ul>
-      ${q.length && !(urgentTask() && me().types.includes("cmn")) ? `<button class="btn primary" data-act="next" style="margin-top:20px">Claim next<kbd>N</kbd></button>` : ""}</div>`;
+      ${q.length && !(urgentTask() && me().types.includes("cmn")) ? `<button class="btn primary" data-act="next" style="margin-top:20px">Claim top task<kbd>N</kbd></button>` : ""}</div>`;
   }
   const t = currentSel();
   if (!t) return crumbs(null) + `<div class="detail empty"><h1>Nothing to claim</h1><p class="lead">New tasks for your task types show up in the list as soon as they're created.</p></div>`;
@@ -1609,6 +1618,7 @@ document.addEventListener("click", e => {
     case "mq": S.mq = v === "never" ? "never" : v; S.mfilter = "all"; S.agentPick = false; break;
     case "mfilter": S.mfilter = v; break;
     case "psec": S.pc = S.pc || {}; S.pc[v] = !S.pc[v]; break;
+    case "showmore": { S.expanded = S.expanded || {}; const q = queue(), sel = currentSel(), items = q.filter(x => grp(x) === +v), selIdx = sel ? items.findIndex(x => x.key === sel.key) : -1; const isOpen = S.expanded[v] || selIdx >= 5; S.expanded[v] = !isOpen; if (isOpen && selIdx >= 5) S.sel = items[0].key; break; }
     case "livescope": S.liveScope = v; break;
     case "ddopen": S.dd = S.dd === v ? null : v; S.agentPick = false; break;
     case "ddpick": return ddPick(b.dataset.dd, v);
