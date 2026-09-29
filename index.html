@@ -752,6 +752,8 @@ body{background:#F4F3F1}
 .qitem .qbody{padding-left:4px}
 .showmore{display:block;width:100%;height:40px;border:0;border-bottom:1px solid var(--line);background:#FAFAF9;color:var(--muted);font-size:13px;font-weight:500;text-align:center}
 .showmore:hover{background:#F2F1EF;color:var(--ink)}
+.empty-line.neutral{background:#F5F4F2;color:var(--muted);font-weight:400;border:1px solid var(--line)}
+.clearall{height:30px;order:0}.tokens .clearall{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1350,10 +1352,10 @@ function typeCenter(k) {
   const dueSel = k === "inbound" ? `<span class="small">Due within: live</span>` : dd({id:`sla:${k}`, label:"Due within", value:ty.due, options:SLAS.map(s => ({v:s, l:s}))});
   return `<div class="crumbs"><span class="small">${ml("Queues", ty.name)}</span><span class="grow"></span>${dueSel}<span class="vsep"></span>${stepper}</div>
   <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every free agent the moment it arrives." : "Moving it up lifts it in every eligible agent's list at once."}</p>
-    <h3 class="sh">Agents on this queue <span class="badge ${workers.length ? "neutral" : "red"} hb">${workers.length}</span></h3>
-    ${workers.length ? "" : `<div class="empty-line late" style="margin-bottom:10px">No agents on this queue. These tasks won't reach anyone until you add one.</div>`}
+    <h3 class="sh">Agents on this queue <span class="badge ${workers.length ? "neutral" : "muted"} hb">${workers.length}</span></h3>
+    ${workers.length ? "" : `<div class="empty-line neutral" style="margin-bottom:10px">No agents on this queue. These tasks won't reach anyone until you add one.</div>`}
     <div class="tokens">${workers.map(a => `<span class="token">${a.name}${a.mcos && a.mcos.length ? `<span class="tmco">${mcoLabel(a)}</span>` : ""}<button data-act="ttype" data-a="${a.id}" data-k="${k}" aria-label="Remove ${a.name} from ${ty.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>`).join("")}
-      <span class="apick"><button class="btn sm" data-act="agentpick" aria-expanded="${!!S.agentPick}">+ Add agent</button>
+      ${workers.length > 1 ? `<button class="btn ghost sm clearall" data-act="clearagents" data-k="${k}">Clear all</button>` : ""}<span class="apick"><button class="btn sm" data-act="agentpick" aria-expanded="${!!S.agentPick}">+ Add agent</button>
       ${S.agentPick ? `<div class="apop" role="dialog" aria-label="Add agent"><input type="search" data-agentq placeholder="Search agents" aria-label="Search agents" autocomplete="off">
         <div class="aopts">${S.agents.filter(a => !a.types.includes(k)).sort((x, y) => (y.on - x.on) || x.name.localeCompare(y.name)).map(a =>
           `<button class="aopt" data-act="addagent" data-a="${a.id}" data-k="${k}" data-name="${a.name.toLowerCase()}"${a.on ? "" : " disabled"}><span>${a.name}</span><span class="small">${a.on ? a.types.map(x => SHORT[x]).join(", ") || "Nothing assigned" : "Out"}</span></button>`).join("") || `<div class="small" style="padding:10px 12px">Everyone already works this queue.</div>`}
@@ -1619,6 +1621,7 @@ document.addEventListener("click", e => {
     case "mfilter": S.mfilter = v; break;
     case "psec": S.pc = S.pc || {}; S.pc[v] = !S.pc[v]; break;
     case "showmore": { S.expanded = S.expanded || {}; const q = queue(), sel = currentSel(), items = q.filter(x => grp(x) === +v), selIdx = sel ? items.findIndex(x => x.key === sel.key) : -1; const isOpen = S.expanded[v] || selIdx >= 5; S.expanded[v] = !isOpen; if (isOpen && selIdx >= 5) S.sel = items[0].key; break; }
+    case "clearagents": { const n = S.agents.filter(a => a.on && a.types.includes(k)).length; S.agents.forEach(a => { a.types = a.types.filter(x => x !== k); }); toast(`Removed ${n} agent${n === 1 ? "" : "s"} from ${tname(k)}.`); break; }
     case "livescope": S.liveScope = v; break;
     case "ddopen": S.dd = S.dd === v ? null : v; S.agentPick = false; break;
     case "ddpick": return ddPick(b.dataset.dd, v);
