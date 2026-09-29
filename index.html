@@ -754,6 +754,22 @@ body{background:#F4F3F1}
 .showmore:hover{background:#F2F1EF;color:var(--ink)}
 .empty-line.neutral{background:#F5F4F2;color:var(--muted);font-weight:400;border:1px solid var(--line)}
 .clearall{height:30px;order:0}.tokens .clearall{color:var(--muted)}
+.plink .ck{color:var(--muted);font-size:12px;min-width:62px}
+.sopl{margin:0 0 8px;padding-left:18px;font-size:13px;line-height:1.5}
+.sopl li{margin-bottom:6px}
+.tasklink{font-size:12px;font-weight:500;color:var(--muted);margin-left:6px;padding:1px 6px;border:1px solid var(--line);border-radius:5px;text-decoration:none}
+.tasklink:hover{color:var(--ink);border-color:#BDBAB4}
+/* How to handle — visual steps */
+.sophead{display:flex;gap:6px;margin-bottom:12px}
+.sopsteps{list-style:none;margin:0 0 12px;padding:0;position:relative}
+.sopsteps li{position:relative;display:grid;grid-template-columns:24px 1fr;gap:10px;padding-bottom:14px}
+.sopsteps li:last-child{padding-bottom:0}
+.sopsteps li:not(:last-child)::before{content:"";position:absolute;left:11px;top:26px;bottom:2px;width:2px;background:#EDE9E3;border-radius:1px}
+.sopn{width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);border:1px solid #F1D2BC;display:grid;place-items:center;font-size:12px;font-weight:600;position:relative;z-index:1}
+.soptxt{font-size:13px;line-height:1.5;padding-top:2px}
+.sopfoot{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding-top:10px;border-top:1px solid var(--line)}
+.sopfoot .tasklink{margin-left:auto}
+.sopn{background:#fff;color:var(--ink);border:1px solid #CFCBC4}
 </style>
 </head>
 <body>
@@ -814,7 +830,7 @@ function seedTasks() {
 function init() {
   seq = 0;
   return {
-    view:"tasks", sel:null, order:["inbound","sms","fmco","escalation","pson","auth","never"], navOpen:true, propsAgent:false, propsMgr:true, mq:"today", mfilter:"all", editAgents:false, filter:null, demo:false,
+    view:"tasks", sel:null, order:["inbound","sms","fmco","escalation","pson","auth","never"], navOpen:true, propsAgent:true, pc:{props:true}, propsMgr:true, mq:"today", mfilter:"all", editAgents:false, filter:null, demo:false,
     types:JSON.parse(JSON.stringify(TYPES)),
     agents:[
       {id:"jasmine",mcos:[],ymcos:[],ooo:0,name:"Jasmine Okafor",on:true,types:["cmn","fmco","escalation","pson","auth"],yesterday:["cmn","inbound"],worked:6,closed:4},
@@ -1049,33 +1065,33 @@ function preview(t) {
     <div class="oooact"><button class="btn primary sm" data-act="oooconfirm" ${S.ooo.reason ? "" : "disabled"}>Claim anyway</button><button class="btn ghost sm" data-act="next">Take top task instead</button></div></div>` : "";
   const right = blockedByHeld ? `<span class="small">Finish your current task to claim</span>` : `<span class="ooowrap"><button class="btn sm" data-act="claim" data-key="${t.key}" aria-expanded="${!!pop}">Claim this task<kbd>C</kbd></button>${pop}</span>`;
   return crumbs(t, right) + `<div class="detail"><h1>${tname(t.type)}</h1>
-    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>${caseLinks(t)}
+    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
     ${t.attempts ? attemptTag(t) : ""}${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, false)}
     ${t.extras.length ? `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box pad">
-      <ul class="plain">${t.extras.includes("phone") ? `<li>Caregiver's own phone number is missing</li>` : ""}${t.extras.includes("consent") ? `<li>Texting consent not recorded</li>` : ""}</ul>
+      <ul class="plain">${t.extras.includes("phone") ? `<li>Caregiver's own phone number is missing <a class="tasklink" href="#" data-act="tasklink" data-v="T-4471">T-4471</a></li>` : ""}${t.extras.includes("consent") ? `<li>Texting consent not recorded <a class="tasklink" href="#" data-act="tasklink" data-v="T-4472">T-4472</a></li>` : ""}</ul>
       <div class="small">These come with the task when you claim it.</div></div>` : ""}
-    ${sopBlock(t)}${timeline(t)}</div>`;
+    ${timeline(t)}</div>`;
 }
 function workspace(t) {
   const r = reason(t);
   const hasPhone = (S.capture.phone || "").trim().length > 5, hasConsent = !!S.capture.consent;
   let h = crumbs(t, `<span class="tag good">Claimed by you</span>`) + `<div class="detail"><h1>${tname(t.type)}</h1>
-    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>${caseLinks(t)}
+    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
     <p class="small touch">This stays yours while you work it. After 5 minutes with no call, note or field change, it goes back to the pool.</p>${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, true)}`;
   if (t.extras.length) {
     h += `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box capture">`;
-    if (t.extras.includes("phone")) h += `<div><label class="lbl" for="cgphone">${esc(t.cg)}'s own phone number <span class="req ${hasPhone ? "met" : ""}">${hasPhone ? "Added" : "Needed to close"}</span></label>
+    if (t.extras.includes("phone")) h += `<div><label class="lbl" for="cgphone">${esc(t.cg)}'s own phone number <a class="tasklink" href="#" data-act="tasklink" data-v="T-4471">T-4471</a>${hasPhone ? ` <span class="req met">Added</span>` : ""}</label>
       <span class="small">The number on file is ${esc(t.phoneNote || "someone else's")}. Flagged by the nightly check 2 days ago.</span>
       <input id="cgphone" data-cap="phone" inputmode="tel" placeholder="(520) 555-0134" value="${esc(S.capture.phone || "")}"></div>`;
-    if (t.extras.includes("consent")) h += `<div><span class="lbl">Texting consent <span class="req ${hasConsent ? "met" : ""}">${hasConsent ? "Recorded" : "Needed to close"}</span></span>
+    if (t.extras.includes("consent")) h += `<div><span class="lbl">Texting consent <a class="tasklink" href="#" data-act="tasklink" data-v="T-4472">T-4472</a>${hasConsent ? ` <span class="req met">Recorded</span>` : ""}</span>
       <span class="small">They didn't opt in on the website. Without it, every update has to be a phone call.</span>
       <div class="chips"><button class="chip" aria-pressed="${S.capture.consent === "yes"}" data-act="cap" data-k="consent" data-v="yes">Agreed to texts</button>
       <button class="chip" aria-pressed="${S.capture.consent === "no"}" data-act="cap" data-k="consent" data-v="no">Declined</button></div></div>`;
     h += `</div>`;
   }
-  h += sopBlock(t) + `<h3 class="sh">Call note</h3><div class="box">
+  h += `<h3 class="sh">Call note</h3><div class="box">
     <div class="notef">${NOTE_FIELDS.map(([k, l]) => `<label class="nrow"><span class="nlbl">${l}</span><textarea rows="1" data-cap="${k}" data-grow>${esc(S.capture[k] || "")}</textarea></label>`).join("")}</div>
     <div class="small pad">Leave blank anything that doesn't apply. Posts to the ${t.id} timeline, tagged to this task.</div></div>
     ${timeline(t)}</div>
@@ -1109,19 +1125,20 @@ function caseLinks(t) {
 }
 function props() {
   const t = S.held ? byKey(S.held) : (S.result ? null : currentSel());
-  if (!t) return `<div class="small" style="padding:20px">Select a task to see its details.</div>`;
+  if (!t) return `<div class="small" style="padding:20px">Select a task to see its context.</div>`;
+  const sop = SOP[`${t.type}:${t.mco}`] || SOP[t.type] || [];
   const status = S.held === t.key ? "Claimed by you" : t.status === "open" ? "Open" : t.status;
-  return `<section class="psec ${pc("props")}">${phead("props","Properties")}<div class="pbody"><dl class="pdl">
-    <dt>Type</dt><dd>${tname(t.type)}</dd><dt>Status</dt><dd>${status}</dd>
+  const link = (c, k, v) => `<div class="plink"><span class="dot" style="background:${c}"></span><span class="ck">${k}</span>${esc(v)}</div>`;
+  return `<section class="psec ${pc("case")}">${phead("case","Case")}<div class="pbody">
+    ${link("#8B6CEF","Case",t.id)}${link("#D9534F","Patient",t.patient)}${link("#3B82F6","Caregiver",t.cg)}${link("#B7892E","MCO",t.mco)}
+    <div class="small" style="margin-top:8px">Step: ${tname(t.type)}</div></div></section>
+    ${sop.length ? `<section class="psec ${pc("sop")}">${phead("sop","How to handle")}<div class="pbody"><div class="sophead"><span class="tag">${tname(t.type)}</span>${t.mco !== "Unknown" ? `<span class="tag">${esc(t.mco)}</span>` : ""}</div><ol class="sopsteps">${sop.map((s, i) => `<li><span class="sopn">${i + 1}</span><span class="soptxt">${esc(s)}</span></li>`).join("")}</ol><div class="sopfoot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg>Enrollment SOP<a href="#" class="tasklink" data-act="tasklink" data-v="The full SOP">Open full SOP</a></div></div></section>` : ""}
+    <section class="psec ${pc("props")}">${phead("props","Properties")}<div class="pbody"><dl class="pdl">
+    <dt>Status</dt><dd>${status}</dd>
     <dt>Due</dt><dd>${t.due < NOW ? `<span class="late">${dur(NOW - t.due)} ago</span>` : `In ${dur(t.due - NOW)}`}</dd>
     ${t.sched != null ? `<dt>Booked for</dt><dd>${fmt(t.sched)}</dd>` : ""}
     <dt>Paused</dt><dd>${t.pauses || 0}×</dd><dt>Released</dt><dd>${t.releases || 0}×</dd>${t.blockedBy ? `<dt>Blocked by</dt><dd>${esc(t.blockedBy.split(":")[0])}</dd>` : ""}
-    <dt>Case created</dt><dd>${String(t.created).replace(/(\d{4})(\d{2})(\d{2})/, "$2/$3/$1")}</dd><dt>Age</dt><dd>${age(t)}</dd></dl></div></section>
-    <section class="psec ${pc("case")}">${phead("case","Case details")}<div class="pbody">
-    <div class="plink"><span class="dot" style="background:#8B6CEF"></span>${t.id}</div>
-    <div class="plink"><span class="dot" style="background:#D9534F"></span>${esc(t.patient)}</div>
-    <div class="plink"><span class="dot" style="background:#3B82F6"></span>${esc(t.cg)}</div>
-    <div class="plink"><span class="dot" style="background:#B7892E"></span>${esc(t.mco)}</div></div></section>`;
+    <dt>Age</dt><dd>${age(t)}</dd></dl></div></section>`;
 }
 function agentPage() {
   return `<div class="tasks"><aside class="qcol" aria-label="Task queue">${queueCol()}</aside>
@@ -1206,8 +1223,6 @@ function outcome(v) {
   S.err = null;
   if (v === "reached") {
     const t = byKey(S.held);
-    const miss = t.extras.filter(e => e === "phone" ? (S.capture.phone || "").trim().length < 6 : !S.capture.consent);
-    if (miss.length) { S.err = "Add the caregiver's phone number and texting consent before closing."; S.panel = null; return render(); }
     return finish("reached");
   }
   if (S.panel?.variant === v) { S.panel = null; return render(); }
@@ -1223,7 +1238,9 @@ function finish(kind) {
     const nx = nextFor(t);
     if (nx.type) S.tasks.push(Object.assign(T(t.id.slice(2), t.patient, t.cg, t.rel, t.phone, nx.type, t.mco, {due:NOW + nx.due, created:t.created, note:"Opened when the previous task closed"}), {}));
     const lines = [`${tname(t.type)} closed for ${esc(t.patient)}`, `Next on this case: ${nx.name}${nx.why ? ` (${nx.why})` : ""}, now in the pool`, `Case step updated to ${nx.step}`];
-    if (S.capture.phone) lines.push(`Saved ${esc(t.cg)}'s number: ${esc(S.capture.phone)}`);
+    if (t.extras.includes("phone") && !S.capture.phone) lines.push(`Caregiver phone still missing, T-4471 stays open`);
+    if (t.extras.includes("consent") && !S.capture.consent) lines.push(`Texting consent not recorded, T-4472 stays open`);
+    if (S.capture.phone) lines.push(`Saved ${esc(t.cg)}\'s number: ${esc(S.capture.phone)}`);
     if (S.capture.consent) lines.push(`Texting consent: ${S.capture.consent === "yes" ? "agreed" : "declined"}`);
     S.result = {title:"Done", lines};
   } else if (S.panel.kind === "pause") {
@@ -1626,6 +1643,7 @@ document.addEventListener("click", e => {
     case "psec": S.pc = S.pc || {}; S.pc[v] = !S.pc[v]; break;
     case "showmore": { S.expanded = S.expanded || {}; const q = queue(), sel = currentSel(), items = q.filter(x => grp(x) === +v), selIdx = sel ? items.findIndex(x => x.key === sel.key) : -1; const isOpen = S.expanded[v] || selIdx >= 5; S.expanded[v] = !isOpen; if (isOpen && selIdx >= 5) S.sel = items[0].key; break; }
     case "clearagents": { const n = S.agents.filter(a => a.on && a.types.includes(k)).length; S.agents.forEach(a => { a.types = a.types.filter(x => x !== k); }); toast(`Removed ${n} agent${n === 1 ? "" : "s"} from ${tname(k)}.`); break; }
+    case "tasklink": e.preventDefault(); toast(`${v} opens as its own task in MC.`); break;
     case "livescope": S.liveScope = v; break;
     case "ddopen": S.dd = S.dd === v ? null : v; S.agentPick = false; break;
     case "ddpick": return ddPick(b.dataset.dd, v);
