@@ -1086,7 +1086,7 @@ function queueCol() {
   const u = urgentTask();
   if (u && me().types.includes("cmn")) h += alertCard({tone:"red", icon:"bolt", label:"Call me now", pill:`<span class="cd" data-cd="${u.createdMs}">2:00</span>`, role:"alert",
     name:esc(u.cg), meta:[u.id, u.mco, `Offered to ${agentsFor("cmn")} agents`],
-    note:S.held ? "Claiming puts your current task back in the pool. You get first pick of it after." : "",
+    note:S.held ? "Claiming returns your current task to the pool. First pick is yours once you finish." : "",
     action:`<button class="btn primary sm" data-act="claim" data-key="${u.key}">Claim</button>`});
   if (canNotify() && Notification.permission === "default" && !S.notifDismissed && me().types.includes("cmn")) h += `<div class="notifask"><div><strong>Don't miss a Call me now</strong><span>Get a sound and a desktop alert while you're in RingCentral or Gmail.</span></div><button class="btn sm" data-act="notifon">Turn on</button><button class="btn ghost sm" data-act="notifno">Not now</button></div>`;
   const soon = S.tasks.find(t => eligible(t) && t.sched != null && t.sched > NOW);
@@ -1109,8 +1109,8 @@ function queueCol() {
       action:`<button class="btn ghost sm" data-act="skipback">Leave it</button><button class="btn sm" data-act="claim" data-key="${b.key}">Claim</button>`});
   }
   const urgentOpen = !!(u && me().types.includes("cmn"));
-  const bar = S.held ? `<div class="qbar"><span class="small">Finish or release this task to claim the next one</span></div>`
-    : urgentOpen ? `<div class="qbar"><span class="small">Call me now comes first. Claim it below.</span></div>`
+  const bar = S.held ? `<div class="qbar"><span class="small">Task in progress. Finish or release it to claim another.</span></div>`
+    : urgentOpen ? `<div class="qbar"><span class="small">Call me now waiting</span></div>`
     : `<div class="qbar"><button class="btn ${S.result ? "" : "primary"} sm" data-act="next" ${S.held || !q.length ? "disabled" : ""}>Claim top task<kbd>N</kbd></button>
     ${q.length ? `<span class="small nextup">Top priority: <b>${esc(q[0].patient)}</b></span>` : `<span class="small">Nothing to claim right now</span>`}</div>`;
   h = `<div class="qtop">${bar}${h}</div><div class="qscroll">`;
@@ -1217,7 +1217,7 @@ function workspace(t) {
   const hasPhone = (S.capture.phone || "").trim().length > 5, hasConsent = !!S.capture.consent;
   let h = crumbs(t, `<span class="tag good">Claimed by you</span>`) + `<div class="detail"><h1>${tname(t.type)}</h1>
 
-    <p class="small touch">This stays yours while you work it. After 5 minutes with no call, note or field change, it goes back to the pool.</p>${blocked(t)}
+    <p class="small touch">Returns to the pool after 5 min without a call, note or field change.</p>${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, true)}`;
   if (t.extras.length) {
     h += `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span><span class="shnote">Recommended, not required</span></h3><div class="box capture">`;
@@ -1251,7 +1251,7 @@ function center() {
       ${q.length && !(urgentTask() && me().types.includes("cmn")) ? `<button class="btn primary" data-act="next" style="margin-top:20px">Claim top task<kbd>N</kbd></button>` : ""}</div>`;
   }
   const t = currentSel();
-  if (!t) return crumbs(null) + `<div class="detail empty"><h1>Nothing to claim</h1><p class="lead">New tasks for your task types show up in the list as soon as they're created.</p></div>`;
+  if (!t) return crumbs(null) + `<div class="detail empty"><h1>Nothing to claim</h1><p class="lead">New tasks from your queues appear here automatically.</p></div>`;
   return preview(t);
 }
 function age(t) { const s = String(t.created), d = new Date(+s.slice(0,4), +s.slice(4,6)-1, +s.slice(6,8)); const n = Math.round((new Date(2026,8,28) - d) / 864e5); return n < 1 ? "Today" : `${n} d`; }
@@ -1326,17 +1326,17 @@ function outOfOrder(t) {
 function claim(key, opts = {}) {
   const tt = byKey(key);
   if (!opts.force && !S.held && outOfOrder(tt)) { S.ooo = {key, reason:null}; S.sel = key; return render(); }
-  if (opts.reason) { tt.oooReason = opts.reason; me().ooo = (me().ooo || 0) + 1; setTimeout(() => { toast(`Claimed out of order: ${opts.reason}. Kelsey sees this in Users.`); render(); }, 0); }
+  if (opts.reason) { tt.oooReason = opts.reason; me().ooo = (me().ooo || 0) + 1; setTimeout(() => { toast(`Claimed out of order: ${opts.reason}. Logged for your manager.`); render(); }, 0); }
   S.ooo = null;
   const t = byKey(key);
-  if (!t || t.status !== "open") { toast("Someone else took that one. It's gone from your queue."); return render(); }
+  if (!t || t.status !== "open") { toast("Already claimed by another agent."); return render(); }
   let msg = null;
   if (S.held) {
     if (t.type !== "cmn") { toast("Finish or release your current task first."); return render(); }
     const h = byKey(S.held);
     h.status = "open"; h.heldBy = null; h.heldAt = null;
     S.interruptedKey = h.key; h.interrupts++;
-    msg = `${h.patient} went back to the pool. You get first pick when you're done.`;
+    msg = `${h.patient} is back in the pool as To Do. First pick is yours once you finish.`;
   }
   t.status = "held"; t.heldBy = "jasmine"; t.heldAt = Date.now();
   Object.assign(S, {touched:false, sel:key, held:key, panel:null, choice:{}, capture:{}, err:null, result:null, onCall:false, offerBack:null, sopOpen:false});
@@ -1353,7 +1353,7 @@ function takeNext() {
     Object.assign(agent("devon"), {now:`${tname(lost.type)}, ${lost.patient}`, mins:0});
     S.collide = false;
     claim(q[1].key, {force:true});
-    toast(`Devon took ${lost.patient} a moment before you. You've got the next one: ${q[1].patient}.`);
+    toast(`${lost.patient} was claimed by Devon Adams. Claimed the next task: ${q[1].patient}.`);
     return render();
   }
   claim(q[0].key, {force:true});
@@ -1436,7 +1436,7 @@ function ddPick(id, v) {
     return render();
   }
   S.dd = null;
-  if (kind === "assign") { const t = byKey(arg); if (v === "__none") { t.assignedTo = null; toast(`${t.patient} is back in the pool.`); } else { t.assignedTo = v; if (v === "jasmine") S.assignNotice = t.key; if (S.notice === t.key) S.notice = null; toast(`Assigned to ${agent(v).name}. Only they see it now, at the top of their list.`); } }
+  if (kind === "assign") { const t = byKey(arg); if (v === "__none") { t.assignedTo = null; toast(`${t.patient} is back in the pool.`); } else { t.assignedTo = v; if (v === "jasmine") S.assignNotice = t.key; if (S.notice === t.key) S.notice = null; toast(`Assigned to ${agent(v).name}. Visible only to them, at the top of their list.`); } }
   if (kind === "sla") { S.types[arg].due = v; toast(`New ${S.types[arg].name} tasks are now due within ${v}.`); }
   if (kind === "msort") S.msort = v;
   if (kind === "out") { agent(arg).outUntil = v; ulog(arg, `set them as ${v.toLowerCase()}`); }
@@ -1520,7 +1520,7 @@ function typeCenter(k) {
 
   const dueSel = k === "inbound" ? `<span class="small">Due within: live</span>` : dd({id:`sla:${k}`, label:"Due within", value:ty.due, options:SLAS.map(s => ({v:s, l:s}))});
   return `<div class="crumbs"><span class="small">Queue settings</span><span class="grow"></span>${dueSel}<span class="vsep"></span>${stepper}</div>
-  <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every free agent the moment it arrives." : "Moving it up lifts it in every eligible agent's list at once."}</p>
+  <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every available agent on arrival." : "Rank applies to every agent on this queue."}</p>
     <h3 class="sh">Agents on this queue <span class="badge ${workers.length ? "neutral" : "muted"} hb">${workers.length}</span></h3>
     ${workers.length ? "" : `<div class="empty-line neutral" style="margin-bottom:10px">No agents on this queue. These tasks won't reach anyone until you add one.</div>`}
     <div class="tokens">${workers.map(a => `<span class="token">${a.name}${a.mcos && a.mcos.length ? `<span class="tmco">${mcoLabel(a)}</span>` : ""}<button data-act="ttype" data-a="${a.id}" data-k="${k}" aria-label="Remove ${a.name} from ${ty.name}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>`).join("")}
@@ -1839,15 +1839,15 @@ document.addEventListener("click", e => {
       if (v === "idle") {
         if (!S.held) { toast("Claim a task first, then try this."); break; }
         const t = byKey(S.held);
-        if (S.touched) { toast(`You've been working ${t.patient} (call, note or field change), so it stays yours.`); break; }
+        if (S.touched) { toast(`Activity recorded. ${t.patient} stays assigned to you.`); break; }
         Object.assign(t, {status:"open", heldBy:null, heldAt:null}); S.held = null; S.sel = null; S.panel = null; S.capture = {};
-        toast(`No activity for 5 minutes. ${t.patient} went back to the pool.`);
+        toast(`No activity for 5 min. ${t.patient} returned to the pool.`);
       }
       if (v === "wake") {
         const p = S.tasks.filter(t => t.status === "paused");
         if (!p.length) { toast("Nothing is paused. Pause a task first (No answer or Call back later)."); break; }
         p.forEach(t => { t.status = "open"; t.pausedUntil = null; });
-        toast(`${p.length} paused task${p.length > 1 ? "s are" : " is"} back in the pool, open to anyone, with the attempt count kept.`);
+        toast(`${p.length} task${p.length > 1 ? "s" : ""} back in To Do. Attempt count kept.`);
       }
       if (v === "away") {
         if (!urgentTask()) { S.tasks.push(Object.assign(T(1488, "Walter Marsh", "Delia Marsh", "daughter", "(512) 555-0182", "cmn", "Molina", {due:NOW + 2, created:20260928, note:"Asked to be called now from the website"}), {createdMs:Date.now()})); setTimeout(() => { const u = urgentTask(); if (u) alertOutside(u, false); }, 50); }
@@ -1883,7 +1883,7 @@ document.addEventListener("click", e => {
     case "clearagents": { const n = S.agents.filter(a => a.on && a.types.includes(k)).length; S.agents.forEach(a => { a.types = a.types.filter(x => x !== k); }); toast(`Removed ${n} agent${n === 1 ? "" : "s"} from ${tname(k)}.`); break; }
     case "tasklink": e.preventDefault(); toast(`${v} opens as its own task in MC.`); break;
     case "actall": S.actAll = !S.actAll; break;
-    case "postnote": { const t = byKey(key); const txt = ((S.drafts || {})[key] || "").trim(); if (!txt) { toast("Write something first."); break; } t.userNotes = [...(t.userNotes || []), {text:txt, time:"Now", at:Date.now()}]; S.drafts[key] = ""; if (S.held === key) S.touched = true; toast("Note posted to the timeline."); break; }
+    case "postnote": { const t = byKey(key); const txt = ((S.drafts || {})[key] || "").trim(); if (!txt) { toast("Note is empty."); break; } t.userNotes = [...(t.userNotes || []), {text:txt, time:"Now", at:Date.now()}]; S.drafts[key] = ""; if (S.held === key) S.touched = true; toast("Note posted to the timeline."); break; }
     case "livescope": S.liveScope = v; break;
     case "ddopen": S.dd = S.dd === v ? null : v; S.agentPick = false; break;
     case "ddpick": return ddPick(b.dataset.dd, v);
@@ -1919,7 +1919,7 @@ document.addEventListener("change", e => {
   if (s.dataset.act === "outuntil") { agent(s.dataset.a).outUntil = s.value; return render(); }
   if (s.dataset.act === "assign" && s.value) {
     const t = byKey(s.dataset.key); t.assignedTo = s.value;
-    toast(`Assigned to ${agent(s.value).name}. Only they see it now, at the top of their list.`);
+    toast(`Assigned to ${agent(s.value).name}. Visible only to them, at the top of their list.`);
     render();
   }
 });
