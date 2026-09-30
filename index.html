@@ -880,6 +880,7 @@ body{background:#F4F3F1}
 .uattn{margin:16px 20px 0;border:1px solid #F1DFA6;border-radius:10px;overflow:hidden}
 .uattnh{display:flex;justify-content:space-between;background:var(--warn-bg);color:var(--warn-ink);padding:9px 14px;font-weight:500;font-size:13.5px}
 .uattnb{padding:10px 14px}
+.uattnl{display:inline-flex;align-items:center;gap:8px}
 .usec{border-bottom:1px solid var(--line);padding:0 20px}
 .ushead{display:flex;align-items:center;gap:6px;padding:18px 0 12px}
 .usec.closed .ushead{padding-bottom:18px}
@@ -1674,7 +1675,7 @@ function userDrawer(u) {
     <div class="udhead">${avatar(u, true)}<div class="udtitle"><div class="udname">${esc(u.name)}</div><div class="small">${esc(u.email)}</div>
       <div class="udmeta"><span class="tag good">Active</span>${status}<span class="small">joined ${u.joined}</span></div></div>
       <button class="iconbtn" data-act="uclose" aria-label="Close">×</button></div><div class="udbody">`;
-  if (w) h += `<div class="uattn"><div class="uattnh"><span>⚠ Needs attention</span><span>1 item</span></div><div class="uattnb"><b>${w[0]}</b><div class="small">${w[1]}</div></div></div>`;
+  if (w) h += `<div class="uattn"><div class="uattnh"><span class="uattnl"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>Needs attention</span><span>1 item</span></div><div class="uattnb"><b>${w[0]}</b><div class="small">${w[1]}</div></div></div>`;
   h += usec("sign", "Can sign in to", null, u.sign ? `<div class="uapp"><b>${u.sign}</b><span class="small">via ${u.role}</span></div><div class="small">No access to Skydeck, Modis, Polaris or Internal.</div>` : `<div class="small">No access to any app.</div>`);
   h += usec("roles", "Roles", u.role ? 1 : 0, u.role ? `<span class="uchip x">${u.role}<span aria-hidden="true">×</span></span>` : `<div class="small">No roles.</div>`, `<button class="iconbtn sm" data-act="nyi" aria-label="Add role">+</button>`);
   const LANES = [["leads","Leads","People whose case is still a lead"],["enrolling","Enrolling","Cases moving through enrollment"],["operational","Operational","Active cases receiving care"],["other","Other","The front door, unknown numbers and senders no rule can place"]];
