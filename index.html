@@ -675,7 +675,7 @@ body{background:#F4F3F1}
 .al-list em{font-style:normal;color:var(--muted);margin-left:6px}
 .todaygrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
 .tcard{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
-.tc-h{display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;border-bottom:1px solid var(--line)}
+.tc-h{display:flex;align-items:center;gap:10px;height:52px;padding:0 28px;border-bottom:1px solid var(--line)}
 .tc-h h3{font-size:15px;font-weight:600}
 .loadrows{display:flex;flex-direction:column}
 .loadrow{display:grid;grid-template-columns:24px minmax(0,1.3fr) minmax(0,1fr) 40px 96px 74px 76px;align-items:center;gap:10px;padding:10px 16px;border:0;border-bottom:1px solid var(--line);background:#fff;text-align:left}
@@ -775,6 +775,137 @@ body{background:#F4F3F1}
 .plink.stack .pk{grid-column:2;font-size:12px;color:var(--muted)}
 .plink.stack .pv{grid-column:2;font-size:14px;overflow-wrap:anywhere;line-height:1.35}
 .plink.stack.last{border-bottom:0}
+/* recent activity in context panel */
+.act{position:relative;padding-left:18px}
+.act::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.act-ev{position:relative;padding:4px 0 10px}
+.act-ev .tl-dot{position:absolute;left:-18px;top:9px;width:10px;height:10px;border-radius:3px;box-shadow:0 0 0 3px #fff}
+.act-txt{font-size:13px;line-height:1.5}
+.act-txt .tl-pill{font-size:12px}
+.act-note{margin-top:4px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#FAFAF9;font-size:12.5px}
+.act-time{font-size:12px;color:var(--muted);margin-top:2px}
+.actmore{font-size:12.5px}
+.cc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.act-txt{line-height:2}.act-txt .tl-pill{margin:0 3px;line-height:1.55;vertical-align:1px}.act-time{line-height:1.4;margin-top:4px}
+.act-note{line-height:1.5}
+.composer{border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:16px;overflow:hidden}
+.composer textarea{border:0;border-radius:0;margin:0;min-height:64px;padding:12px 14px;resize:vertical;display:block;width:100%}
+.composer textarea:focus{outline:none}
+.composer:focus-within{border-color:#BDBAB4;box-shadow:0 0 0 2px var(--accent-soft)}
+.composer-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 14px;border-top:1px solid var(--line);background:#FAFAF9}
+.shnote{font-size:12.5px;font-weight:400;color:var(--muted);margin-left:4px}
+.sh .shnote{margin-left:auto}
+.xlink{color:inherit;text-decoration:none}.xlink:hover{text-decoration:underline;text-underline-offset:3px}
+/* Queues as tabs (Inbox pattern) */
+.qwrap{display:flex;flex-direction:column;height:100%;min-height:0}
+.qtabs{display:flex;align-items:flex-end;gap:2px;height:52px;padding:0 28px;border-bottom:1px solid var(--line);flex:none;overflow-x:auto}
+.qtab{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 10px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
+.qtab:hover{color:var(--ink)}
+.qtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.qtab.open{padding:0 4px 0 10px;gap:2px}
+.qtab.open>button{border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:0}
+.qtab .qx{width:22px;height:22px;border-radius:5px;display:grid;place-items:center;font-size:16px;line-height:1;color:var(--muted);margin-left:4px}
+.qtab .qx:hover{background:var(--sunk);color:var(--ink)}
+.badge.accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.tasks.qmode{grid-template-columns:minmax(0,1fr) 280px;flex:1;min-height:0;height:auto}
+.body.props-closed .tasks.qmode{grid-template-columns:minmax(0,1fr) 0}
+.subtabs{display:flex;gap:4px;padding:0 28px;height:46px;align-items:flex-end;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+.subtab{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 10px;border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer}
+.subtab span{color:var(--faint);font-weight:500}
+.subtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.subtab:hover{color:var(--ink)}
+.qover{padding-top:22px}
+.qover .cards{margin-bottom:18px}
+.qtable td{padding:10px 8px;vertical-align:middle}
+.qtable .grip-td{padding-left:12px;padding-right:0;width:28px}
+.qtable .grip{display:grid;place-items:center;color:#B3AEA6;cursor:grab}
+.qtable .lr-bar{margin-top:6px}
+.qtable .chev-td{color:var(--faint);padding-right:14px}
+.qtable .chev-td .chev{transform:rotate(-90deg)}
+.qrow:hover td{background:#FAFAF9}
+.qrow.dragging{opacity:.45}
+.qrow.dropabove td{box-shadow:inset 0 2px 0 var(--accent)}
+.qrow.dropbelow td{box-shadow:inset 0 -2px 0 var(--accent)}
+.qrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.qtable td:nth-child(2),.qtable th:nth-child(2){width:40px;white-space:nowrap}
+.qtable td:nth-child(3),.qtable th:nth-child(3){width:100%;white-space:normal}
+.qtable td:nth-child(1),.qtable th:nth-child(1){width:28px}
+.qtab,.subtab{margin-bottom:-1px;position:relative;z-index:1}
+.qtabs{overflow:visible}
+/* Queues tables: MC Inbox look (flush, full-bleed rows) */
+.qwrap .detail.wide{max-width:none;margin:0;padding-left:28px;padding-right:28px}
+.qwrap .table-wrap{border:0;border-radius:0;background:transparent;margin:0 -28px 16px;border-top:1px solid var(--line)}
+.qwrap table th{font-size:13.5px;font-weight:500;color:var(--muted);padding:12px 10px}
+.qwrap table td{padding:14px 10px}
+.qwrap table th:first-child,.qwrap table td:first-child{padding-left:28px}
+.qwrap table th:last-child,.qwrap table td:last-child{padding-right:28px}
+.qwrap tbody tr:last-child td{border-bottom:1px solid var(--line)}
+.qwrap .qtable .grip-td{padding-left:22px}
+.qwrap .qtable .chev-td{padding-right:28px}
+.qwrap .tabsbar.plain{border-bottom:0;margin-bottom:0;padding-left:0}
+.qwrap td[colspan]{padding-left:28px!important}
+.stchip{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.stchip svg,.oc-in svg{flex:none}
+.oc-in{display:inline-flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+/* Users: MC Admin > Access > Users */
+.upage{min-height:100%}
+.upage .utool{display:flex;align-items:center;gap:10px;padding:14px 28px;margin:0;border-bottom:1px solid var(--line)}
+.upage .usearch{flex:0 1 320px}
+.upage .table-wrap{border:0;border-radius:0;background:transparent;margin:0}
+.utable{min-width:760px}
+.utable th{font-size:13.5px;font-weight:500;color:var(--muted);padding:12px 10px}
+.utable td{padding:12px 10px;border-bottom:1px solid var(--line)}
+.utable th:first-child,.utable td:first-child{padding-left:28px}
+.utable th:last-child,.utable td:last-child{padding-right:28px}
+.utable tbody tr:last-child td{border-bottom:1px solid var(--line)}
+.utable tr[hidden]{display:none}
+.utable td[colspan]{padding:20px 28px}
+.urow.sel td{background:#F4F2EE}
+.ucell{display:flex;align-items:center;gap:12px}
+.uname{display:flex;align-items:center;gap:6px;font-weight:500}
+.uav{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:11px;font-weight:600;color:var(--c);background:color-mix(in srgb,var(--c) 14%,#fff);border:1px solid color-mix(in srgb,var(--c) 30%,#fff)}
+.uav.none{background:transparent;border-color:transparent}
+.uav.big{width:44px;height:44px;font-size:15px}
+.uchip{display:inline-flex;align-items:center;gap:8px;font-size:13px;padding:3px 10px;border:1px solid var(--line);border-radius:7px;background:var(--bg);white-space:nowrap}
+.uchip.x span{color:var(--muted);cursor:pointer}
+.umuted{color:var(--muted)}
+.ubackdrop{position:fixed;inset:0;background:rgba(20,18,15,.38);z-index:40}
+.udrawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:#fff;z-index:41;display:flex;flex-direction:column;box-shadow:-12px 0 32px rgba(0,0,0,.12)}
+.udhead{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;border-bottom:1px solid var(--line)}
+.udtitle{flex:1;min-width:0}
+.udname{font-size:17px;font-weight:600}
+.udmeta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.udhead .iconbtn{font-size:20px;line-height:1}
+.udbody{flex:1;overflow:auto;padding-bottom:40px}
+.uattn{margin:16px 20px 0;border:1px solid #F1DFA6;border-radius:10px;overflow:hidden}
+.uattnh{display:flex;justify-content:space-between;background:var(--warn-bg);color:var(--warn-ink);padding:9px 14px;font-weight:500;font-size:13.5px}
+.uattnb{padding:10px 14px}
+.usec{border-bottom:1px solid var(--line);padding:0 20px}
+.ushead{display:flex;align-items:center;gap:6px;padding:18px 0 12px}
+.usec.closed .ushead{padding-bottom:18px}
+.ushbtn{flex:1;text-align:left;border:0;background:transparent;padding:0;font:inherit;font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.ushbtn:hover{color:var(--ink)}
+.ucount{letter-spacing:0;font-weight:500;color:var(--faint)}
+.usec.closed .ushead .chev{transform:rotate(-90deg)}
+.iconbtn.sm{width:28px;height:28px}
+.usbody{padding-bottom:18px}
+.uapp{display:flex;align-items:baseline;gap:12px;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:8px}
+.uapp b{font-weight:500}
+.ucheck{display:flex;align-items:flex-start;gap:12px;width:100%;border:0;background:transparent;padding:7px 0;text-align:left;font:inherit;cursor:pointer}
+.ucheck .cbx{margin-top:1px;flex:none}
+.ucheck[aria-checked=true] .cbx{background:var(--accent);border-color:var(--accent)}
+.ucheck:disabled{opacity:.5;cursor:default}
+.ucheck>span:last-child{display:flex;flex-direction:column;gap:2px}
+.uct{font-weight:500}
+.unote{margin-top:10px}
+.uavail{display:flex;gap:12px;align-items:flex-start;padding:4px 0 12px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.uavail .toggle{margin-top:2px}
+.ucards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ucard{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.ucl{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ucv{font-weight:500}
+.ulog{list-style:none;padding:0;margin:0}
+.ulog li{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
 </style>
 </head>
 <body>
@@ -783,7 +914,7 @@ body{background:#F4F3F1}
 
 const NOW = 689; // 11:29 AM
 const TYPES = {
-  cmn:{name:"Call me now",p:10,due:"2 min",sub:"Caregiver asked on the website",fixed:true,stats:[0,0,"—",0]},
+  cmn:{name:"Call me now",p:10,due:"2 min",sub:"Caregiver asked on the website",stats:[0,0,"—",0]},
   inbound:{name:"Inbound calls",p:10,due:"Live",sub:"Phone",stats:[9,0,"4 min",2]},
   sms:{name:"SMS queue",p:10,due:"15 min",sub:"Texts from caregivers",stats:[14,0,"12 min",5]},
   fmco:{name:"First MCO call",p:9,due:"2 h",sub:"Superior, Molina, Amerigroup, Cigna, UHC",stats:[41,9,"2 d",12]},
@@ -835,7 +966,7 @@ function seedTasks() {
 function init() {
   seq = 0;
   return {
-    view:"tasks", sel:null, order:["inbound","sms","fmco","escalation","pson","auth","never"], navOpen:true, propsAgent:true, pc:{props:true}, propsMgr:true, mq:"today", mfilter:"all", editAgents:false, filter:null, demo:false,
+    view:"tasks", sel:null, order:["cmn","inbound","sms","fmco","escalation","pson","auth","never"], navOpen:true, propsAgent:true, pc:{props:true}, propsMgr:true, mq:"today", mfilter:"all", editAgents:false, filter:null, demo:false,
     types:JSON.parse(JSON.stringify(TYPES)),
     agents:[
       {id:"jasmine",mcos:[],ymcos:[],ooo:0,name:"Jasmine Okafor",on:true,types:["cmn","fmco","escalation","pson","auth"],yesterday:["cmn","inbound"],worked:6,closed:4},
@@ -868,8 +999,7 @@ const agentsFor = type => S.agents.filter(a => a.on && a.types.includes(type)).l
 const checkSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 
 function applyOrder(prevP) {
-  S.order.forEach((k, i) => { S.types[k].p = Math.max(1, 9 - i); });
-  S.types.cmn.p = 10;
+  S.order.forEach((k, i) => { S.types[k].p = Math.max(1, 10 - i); });
   if (prevP) for (const t of S.tasks) if (t.pOver != null) { const d = t.pOver - prevP[t.type]; t.pOver = Math.min(10, Math.max(1, S.types[t.type].p + d)); if (t.pOver === S.types[t.type].p) t.pOver = null; }
 }
 function moveType(k, to) {
@@ -1023,10 +1153,8 @@ function callCard(t, live) {
     ${live ? `<button class="btn ${S.onCall ? "oncall" : "primary"}" data-act="call">${S.onCall ? "On call, hang up" : "Call " + esc(t.cg.split(" ")[0])}</button>` : ""}</div>
     <dl class="cc-grid">
       ${f("Caregiver", `${esc(t.cg)} <span class="small">${esc(t.rel)}</span>`)}
-      ${f("Phone", `<span class="mono">${esc(t.phone)}</span>${t.phoneNote ? `<div><span class="tag warn">${esc(t.phoneNote)}</span></div>` : ""}`)}
-      ${f("Patient", esc(t.patient))}
-      ${f("MCO", esc(t.mco))}
-      ${f("Call type", t.sched != null ? "Booked by the caregiver" : "Outbound")}
+      ${f("Phone", `<span class="mono">${esc(t.phone)}</span>${t.phoneNote ? `<div><span class="tag">${esc(t.phoneNote)}</span></div>` : ""}`)}
+
     </dl></div>`;
 }
 function sopBlock(t) {
@@ -1035,16 +1163,17 @@ function sopBlock(t) {
   return `<details class="box"${S.sopOpen ? " open" : ""} data-sop><summary>How to handle a ${tname(t.type)}${t.mco !== "Unknown" ? ` with ${esc(t.mco)}` : ""}</summary>
     <ol>${sop.map(s => `<li>${esc(s)}</li>`).join("")}</ol><div class="small pad">From the Enrollment SOP</div></details>`;
 }
-function timeline(t) {
+function timeline(t, compact) {
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const s = String(t.created), cDay = `${MONTHS[+s.slice(4,6) - 1]} ${+s.slice(6,8)}`;
   const pill = x => `<span class="tl-pill">${esc(x)}</span>`;
   const ev = [];
   const today = cDay === "Sep 28" ? "Today" : "Today";
-  if (S.held === t.key) ev.push({day:"Today", time:"11:29 AM", html:`You claimed ${pill(tname(t.type))}${t.oooReason ? " out of order" : ""}`, note:t.oooReason ? "Reason: " + t.oooReason : ""});
+  for (const n of (t.userNotes || [])) ev.push({day:"Today", time:n.time, html:`You added a note`, note:n.text, k2:n.at});
+  if (S.held === t.key) ev.push({day:"Today", time:"11:29 AM", html:`You claimed ${pill(tname(t.type))}${t.oooReason ? " out of order" : ""}, status ${pill("In Progress")}`, note:t.oooReason ? "Reason: " + t.oooReason : ""});
   if (t.pOver != null) ev.push({day:"Today", time:"11:20 AM", html:`Kelsey Anderson set this task to ${pill("P" + t.pOver)}`});
-  if (t.releases) ev.push({day:"Today", time:"9:52 AM", html:`${esc(t.lastBy || "An agent")} released this task back to the pool`, note:"Reason: Waiting on another team"});
-  if (t.pauses) ev.push({day:"Today", time:"9:40 AM", html:`${esc(t.lastBy || "An agent")} paused this task until ${pill("11:00 AM")}`, note:"Reason: No answer"});
+  if (t.releases) ev.push({day:"Today", time:"9:52 AM", html:`${esc(t.lastBy || "An agent")} released this task back to the pool, status ${pill("To Do")}`, note:"Reason: Waiting on another team"});
+  if (t.pauses) ev.push({day:"Today", time:"9:40 AM", html:`${esc(t.lastBy || "An agent")} paused this task until ${pill("11:00 AM")}, status ${pill("To Do")}`, note:"Reason: No answer"});
   if (t.extras.includes("phone")) ev.push({day:"Sep 26", time:"2:00 AM", html:`Nightly check flagged ${pill("Caregiver phone")} as missing on ${pill(t.id)}`});
   if (t.note) ev.push({day:cDay === "Sep 28" ? "Today" : cDay, time:"2:14 PM", html:`Note added to ${pill(t.id)}`, note:t.note});
   if (t.sched != null) ev.push({day:t.created >= 20260927 ? (t.created === 20260928 ? "Today" : "Sep 27") : "Sep 27", time:"4:05 PM", html:`${esc(t.cg)} booked a call for ${pill("Sep 28, " + fmt(t.sched))} through the website`});
@@ -1053,9 +1182,14 @@ function timeline(t) {
   const days = [];
   const KEY = {"Today":20260928, "Sep 27":20260927, "Sep 26":20260926};
   ev.forEach(e => { e.k = KEY[e.day] ?? t.created; });
-  ev.sort((a, b) => b.k - a.k);
+  ev.sort((a, b) => b.k - a.k || (b.k2 || 0) - (a.k2 || 0));
   ev.forEach(e => { let d = days.find(x => x.day === e.day); if (!d) days.push(d = {day:e.day, items:[]}); d.items.push(e); });
-  return `<h3 class="sh">Timeline</h3><div class="tl2">${days.map(d => `<div class="tl-day">${d.day}</div>${d.items.map(e => `
+  if (compact) {
+    const list = S.actAll ? ev : ev.slice(0, 3);
+    return `<div class="act">${list.map(e => `<div class="act-ev"><span class="tl-dot" aria-hidden="true"></span><div class="act-txt">${e.html}${e.note ? `<div class="act-note">${esc(e.note)}</div>` : ""}<div class="act-time">${e.day}, ${e.time}</div></div></div>`).join("")}</div>${ev.length > 3 ? `<button class="linkbtn actmore" data-act="actall">${S.actAll ? "Show less" : `Show all ${ev.length}`}</button>` : ""}`;
+  }
+  const composer = `<div class="composer"><textarea data-draft="${t.key}" rows="2" placeholder="Leave a note…" aria-label="Leave a note">${esc((S.drafts || {})[t.key] || "")}</textarea><div class="composer-bar"><span class="small">Visible to everyone on ${t.id}</span><button class="btn sm" data-act="postnote" data-key="${t.key}">Post note</button></div></div>`;
+  return `<h3 class="sh">Timeline</h3>${composer}<div class="tl2">${days.map(d => `<div class="tl-day">${d.day}</div>${d.items.map(e => `
     <div class="tl-ev"><span class="tl-dot" aria-hidden="true"></span><div class="tl-txt">${e.html}${e.note ? `<div class="tl-note">${esc(e.note)}</div>` : ""}</div><span class="tl-time">${e.time}</span></div>`).join("")}`).join("")}</div>`;
 }
 function blocked(t) { return t.blockedBy ? `<div class="blockbox"><b>Blocked by ${esc(t.blockedBy)}</b><div class="small">You can still work it. It shows here so you know why it may stall.</div></div>` : ""; }
@@ -1070,11 +1204,11 @@ function preview(t) {
     <div class="oooact"><button class="btn primary sm" data-act="oooconfirm" ${S.ooo.reason ? "" : "disabled"}>Claim anyway</button><button class="btn ghost sm" data-act="next">Take top task instead</button></div></div>` : "";
   const right = blockedByHeld ? `<span class="small">Finish your current task to claim</span>` : `<span class="ooowrap"><button class="btn sm" data-act="claim" data-key="${t.key}" aria-expanded="${!!pop}">Claim this task<kbd>C</kbd></button>${pop}</span>`;
   return crumbs(t, right) + `<div class="detail"><h1>${tname(t.type)}</h1>
-    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
+
     ${t.attempts ? attemptTag(t) : ""}${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, false)}
-    ${t.extras.length ? `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box pad">
-      <ul class="plain">${t.extras.includes("phone") ? `<li>Caregiver's own phone number is missing <a class="tasklink" href="#" data-act="tasklink" data-v="T-4471">T-4471</a></li>` : ""}${t.extras.includes("consent") ? `<li>Texting consent not recorded <a class="tasklink" href="#" data-act="tasklink" data-v="T-4472">T-4472</a></li>` : ""}</ul>
+    ${t.extras.length ? `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span><span class="shnote">Recommended, not required</span></h3><div class="box pad">
+      <ul class="plain">${t.extras.includes("phone") ? `<li><a class="xlink" href="#" data-act="tasklink" data-v="T-4471">Caregiver's own phone number is missing</a> <a class="tasklink" href="#" data-act="tasklink" data-v="T-4471">T-4471</a></li>` : ""}${t.extras.includes("consent") ? `<li><a class="xlink" href="#" data-act="tasklink" data-v="T-4472">Texting consent not recorded</a> <a class="tasklink" href="#" data-act="tasklink" data-v="T-4472">T-4472</a></li>` : ""}</ul>
       <div class="small">These come with the task when you claim it.</div></div>` : ""}
     ${timeline(t)}</div>`;
 }
@@ -1082,11 +1216,11 @@ function workspace(t) {
   const r = reason(t);
   const hasPhone = (S.capture.phone || "").trim().length > 5, hasConsent = !!S.capture.consent;
   let h = crumbs(t, `<span class="tag good">Claimed by you</span>`) + `<div class="detail"><h1>${tname(t.type)}</h1>
-    <p class="lead">${esc(t.patient)}'s case is at the ${tname(t.type)} step.</p>
+
     <p class="small touch">This stays yours while you work it. After 5 minutes with no call, note or field change, it goes back to the pool.</p>${blocked(t)}
     <h3 class="sh">Call information</h3>${callCard(t, true)}`;
   if (t.extras.length) {
-    h += `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span></h3><div class="box capture">`;
+    h += `<h3 class="sh">Also on this call <span class="badge neutral hb">${t.extras.length}</span><span class="shnote">Recommended, not required</span></h3><div class="box capture">`;
     if (t.extras.includes("phone")) h += `<div><label class="lbl" for="cgphone">${esc(t.cg)}'s own phone number <a class="tasklink" href="#" data-act="tasklink" data-v="T-4471">T-4471</a>${hasPhone ? ` <span class="req met">Added</span>` : ""}</label>
       <span class="small">The number on file is ${esc(t.phoneNote || "someone else's")}. Flagged by the nightly check 2 days ago.</span>
       <input id="cgphone" data-cap="phone" inputmode="tel" placeholder="(520) 555-0134" value="${esc(S.capture.phone || "")}"></div>`;
@@ -1105,7 +1239,7 @@ function workspace(t) {
       <div class="reshead"><span class="reslbl">How did the call go?</span><span class="grow"></span><button class="btn ghost sm" data-act="panel" data-v="release" aria-pressed="${S.panel?.variant === "release"}">Release without finishing</button></div>
       <div class="resrow"><div class="outcomes">
       ${[["reached","Reached them",1],["noanswer","No answer",2],["later","Call back later",3],["inelig","Not eligible",4]].map(([v, l, k]) =>
-        `<button class="btn" aria-pressed="${S.panel?.variant === v}" data-act="outcome" data-v="${v}" aria-keyshortcuts="${k}">${l}</button>`).join("")}</div></div></div>`;
+        `<button class="btn" aria-pressed="${S.panel?.variant === v}" data-act="outcome" data-v="${v}" aria-keyshortcuts="${k}" title="Sets status to ${ST_LBL[OUT_ST[v]]}">${l}</button>`).join("")}</div></div></div>`;
   return h;
 }
 function center() {
@@ -1132,7 +1266,7 @@ function props() {
   const t = S.held ? byKey(S.held) : (S.result ? null : currentSel());
   if (!t) return `<div class="small" style="padding:20px">Select a task to see its context.</div>`;
   const sop = SOP[`${t.type}:${t.mco}`] || SOP[t.type] || [];
-  const status = S.held === t.key ? "Claimed by you" : t.status === "open" ? "Open" : t.status;
+  const status = stChip(realStatus(t)) + (t.status === "paused" ? `<div class="small">Hidden from the pool until ${t.pausedUntil}</div>` : "");
   const link = (c, k, v) => `<div class="plink stack"><span class="dot" style="background:${c}"></span><span class="pk">${k}</span><span class="pv">${esc(v)}</span></div>`;
   return `<section class="psec ${pc("case")}">${phead("case","Case")}<div class="pbody">
     ${link("#8B6CEF","Case",t.id)}${link("#D9534F","Patient",t.patient)}${link("#3B82F6","Caregiver",t.cg)}${link("#B7892E","MCO",t.mco)}
@@ -1165,13 +1299,13 @@ function panel(t) {
   if (P.kind === "pause") return `<div class="panel"><div class="row"><span class="lbl">Try again</span>${chips("time", TIMES)}</div>
     <div class="row"><span class="lbl">Why</span>${chips("reason", P.reasons)}</div>
     <button class="btn primary" data-act="confirm">Pause until ${esc(c.time)}</button>
-    <p class="meta" style="margin:10px 0 0">It leaves every queue until then, then comes back open for whoever's free. This counts as attempt ${t.attempts + 1}.</p></div>`;
+    <p class="meta" style="margin:10px 0 0">Status goes back to To Do, hidden from every queue until then. This counts as attempt ${t.attempts + 1}.</p></div>`;
   if (P.kind === "inelig") return `<div class="panel"><div class="row"><span class="lbl">Reason</span>${chips("reason", P.reasons)}</div>
     <button class="btn primary" data-act="confirm">Close as not eligible</button>
-    <p class="meta" style="margin:10px 0 0">Kelsey decides whether the case is lost.</p></div>`;
+    <p class="meta" style="margin:10px 0 0">Status set to Abandoned. Kelsey decides whether the case is lost.</p></div>`;
   return `<div class="panel"><div class="row"><span class="lbl">Why are you releasing it?</span>${chips("reason", P.reasons)}</div>
     <button class="btn primary" data-act="confirm">Release to the pool</button>
-    <p class="meta" style="margin:10px 0 0">Anyone set up for ${tname(t.type)} can take it. Your attempt stays in its history.</p></div>`;
+    <p class="meta" style="margin:10px 0 0">Status goes back to To Do. Anyone set up for ${tname(t.type)} can take it. Your attempt stays in its history.</p></div>`;
 }
 function nextFor(t) {
   if (t.type === "fmco") return t.mco === "Superior" ? {name:"Provider statement of need", type:"pson", step:"Waiting on PSON", due:2880, why:"Superior needs one after this call"} : {name:"Schedule nurse visit", type:null, step:"Need to schedule nurse visit"};
@@ -1242,7 +1376,7 @@ function finish(kind) {
     t.status = "done"; a.worked++; a.closed++;
     const nx = nextFor(t);
     if (nx.type) S.tasks.push(Object.assign(T(t.id.slice(2), t.patient, t.cg, t.rel, t.phone, nx.type, t.mco, {due:NOW + nx.due, created:t.created, note:"Opened when the previous task closed"}), {}));
-    const lines = [`${tname(t.type)} closed for ${esc(t.patient)}`, `Next on this case: ${nx.name}${nx.why ? ` (${nx.why})` : ""}, now in the pool`, `Case step updated to ${nx.step}`];
+    const lines = [`${tname(t.type)} for ${esc(t.patient)} set to Completed`, `Next on this case: ${nx.name}${nx.why ? ` (${nx.why})` : ""}, now in the pool`, `Case step updated to ${nx.step}`];
     if (t.extras.includes("phone") && !S.capture.phone) lines.push(`Caregiver phone still missing, T-4471 stays open`);
     if (t.extras.includes("consent") && !S.capture.consent) lines.push(`Texting consent not recorded, T-4472 stays open`);
     if (S.capture.phone) lines.push(`Saved ${esc(t.cg)}\'s number: ${esc(S.capture.phone)}`);
@@ -1250,14 +1384,14 @@ function finish(kind) {
     S.result = {title:"Done", lines};
   } else if (S.panel.kind === "pause") {
     Object.assign(t, {status:"paused", pausedUntil:S.choice.time, heldBy:null, lastBy:"Jasmine O.", due:WAKE[S.choice.time]}); t.attempts++; t.pauses++; a.worked++;
-    toast(`Paused until ${S.choice.time}. Then it goes back to the pool.`);
+    toast(`Back to To Do. Hidden from the pool until ${S.choice.time}.`);
     S.result = null;
   } else if (S.panel.kind === "inelig") {
-    t.status = "done"; a.worked++; a.closed++;
-    S.result = {title:"Closed as not eligible", lines:[`${esc(t.patient)}: ${esc(S.choice.reason)}`, "Sent to Kelsey to decide whether the case is lost"]};
+    t.status = "done"; t.closedAs = "abandoned"; a.worked++; a.closed++;
+    S.result = {title:"Closed as not eligible", lines:[`${esc(t.patient)}: ${esc(S.choice.reason)}`, "Status set to Abandoned", "Sent to Kelsey to decide whether the case is lost"]};
   } else {
     Object.assign(t, {status:"open", heldBy:null, heldAt:null, lastBy:"Jasmine O."}); t.attempts++; t.releases++;
-    toast(`${t.patient} is back in the pool.`);
+    toast(`${t.patient} is back in the pool as To Do.`);
     S.result = null;
   }
   S.held = null; S.sel = null; S.panel = null; S.capture = {}; S.onCall = false;
@@ -1271,6 +1405,16 @@ function finish(kind) {
 }
 
 // ---------- manager ----------
+const ST_IC = {
+  todo:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8C867C" stroke-width="2" stroke-dasharray="3.2 3" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>`,
+  progress:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></svg>`,
+  completed:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2F7D3B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>`,
+  abandoned:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>`
+};
+const ST_LBL = {todo:"To Do", progress:"In Progress", completed:"Completed", abandoned:"Abandoned"};
+const realStatus = t => t.status === "held" ? "progress" : t.status === "done" ? (t.closedAs === "abandoned" ? "abandoned" : "completed") : "todo";
+const stChip = k => `<span class="stchip">${ST_IC[k]}${ST_LBL[k]}</span>`;
+const OUT_ST = {reached:"completed", noanswer:"todo", later:"todo", inelig:"abandoned"};
 const CHEV = `<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 const TICK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 function dd(o) {
@@ -1295,7 +1439,8 @@ function ddPick(id, v) {
   if (kind === "assign") { const t = byKey(arg); if (v === "__none") { t.assignedTo = null; toast(`${t.patient} is back in the pool.`); } else { t.assignedTo = v; if (v === "jasmine") S.assignNotice = t.key; if (S.notice === t.key) S.notice = null; toast(`Assigned to ${agent(v).name}. Only they see it now, at the top of their list.`); } }
   if (kind === "sla") { S.types[arg].due = v; toast(`New ${S.types[arg].name} tasks are now due within ${v}.`); }
   if (kind === "msort") S.msort = v;
-  if (kind === "out") agent(arg).outUntil = v;
+  if (kind === "out") { agent(arg).outUntil = v; ulog(arg, `set them as ${v.toLowerCase()}`); }
+  if (kind === "ufilter") S.ufilter = v;
   render();
 }
 function placeDD() {
@@ -1310,9 +1455,9 @@ function placeDD() {
   pop.querySelector("[data-ddq]")?.focus();
 }
 function mgrState(t) {
-  if (t.status === "done") return {text:"Done", cls:"good"};
-  if (t.status === "held") { const a = agent(t.heldBy); return {text:`Claimed by ${a ? a.name.split(" ")[0] : "?"}, ${Math.max(0, Math.round((Date.now() - t.heldAt) / 60000))} min`, cls:"ok"}; }
-  if (t.status === "paused") return {text:`Paused until ${t.pausedUntil}, due moved there`, cls:"ok"};
+  if (t.status === "done") return {text:ST_LBL[realStatus(t)], cls:t.closedAs === "abandoned" ? "late" : "good"};
+  if (t.status === "held") { const a = agent(t.heldBy); return {text:`In Progress, ${a ? a.name.split(" ")[0] : "?"}, ${Math.max(0, Math.round((Date.now() - t.heldAt) / 60000))} min`, cls:"ok"}; }
+  if (t.status === "paused") return {text:`To Do, hidden until ${t.pausedUntil}`, cls:"ok"};
   if (t.blockedBy && t.status === "open" && t.pOver == null) return {text:`${t.due < NOW ? dur(NOW - t.due) + " past due, " : ""}blocked`, cls:t.due < NOW ? "late" : "ok"};
   if (t.sched != null && t.sched <= NOW) return {text:`Booked ${fmt(t.sched)}, ${dur(NOW - t.sched)} late`, cls:"late"};
   if (t.sched != null) return {text:`Booked ${fmt(t.sched)}`, cls:"ok"};
@@ -1336,7 +1481,6 @@ function mqList() {
   const naOn = S.mq === "today" || ["missed","pastdue"].includes(S.mq);
   h += `<button class="mqrow ${naOn ? "active" : ""}" data-act="mq" data-v="today"><span class="mq-lead"><span class="gripspace"></span><span class="rankslot att">${ALERT_IC}</span></span><span class="mq-body"><span class="mq-name">Needs attention</span><span class="mq-sub small">Missed calls, never contacted, past due</span></span><span class="mq-meta"></span></button>`;
   h += `<div class="ghead">Task types<span>most important first</span></div>`;
-  h += `<div class="mqrow fixed"><span class="mq-lead"><span class="gripspace"></span><span class="rankslot" title="Always first">${PIN}</span></span><span class="mq-body"><span class="mq-name">Call me now</span><span class="mq-sub small">Always first</span></span><span class="mq-meta"><span class="badge muted">0</span></span></div>`;
   S.order.forEach((k, i) => {
     const ty = S.types[k], [o, p] = ty.stats, none = !agentsFor(k);
     h += `<div class="mqrow drag ${S.mq === k ? "active" : ""}" draggable="true" data-drag="${k}" tabindex="0" role="button" data-act="mq" data-v="${k}" aria-label="${ty.name}, rank ${i + 1} of ${S.order.length}. Alt plus arrow keys to move." title="${ty.name}${p ? `, ${p} past due` : ""}${none ? ", no agents" : ""}">
@@ -1359,7 +1503,7 @@ function taskTable(rows, foot) {
     </tbody></table></div>${foot ? `<div class="small">${foot}</div>` : ""}`;
 }
 function viewCenter(title, lead, rows, foot) {
-  return `<div class="crumbs"><button class="linkbtn crumblink" data-act="mq" data-v="today">Needs attention</button><span class="small">›</span><span class="small">${title}</span></div><div class="detail wide">
+  return `<div class="detail wide">
     <h1>${title}</h1><p class="lead">${lead}</p>${taskTable(rows, foot)}</div>`;
 }
 function typeCenter(k) {
@@ -1375,7 +1519,7 @@ function typeCenter(k) {
   const stepper = ty.fixed ? `<span class="small">Always first</span>` : `<span class="stepper labeled"><span class="fl">Rank</span><button data-act="rank" data-k="${k}" data-v="-1" aria-label="Move up" ${rankOf(k) === 1 ? "disabled" : ""}>↑</button><b>${rankOf(k)} of ${S.order.length}</b><button data-act="rank" data-k="${k}" data-v="1" aria-label="Move down" ${rankOf(k) === S.order.length ? "disabled" : ""}>↓</button></span>`;
 
   const dueSel = k === "inbound" ? `<span class="small">Due within: live</span>` : dd({id:`sla:${k}`, label:"Due within", value:ty.due, options:SLAS.map(s => ({v:s, l:s}))});
-  return `<div class="crumbs"><span class="small">${ml("Queues", ty.name)}</span><span class="grow"></span>${dueSel}<span class="vsep"></span>${stepper}</div>
+  return `<div class="crumbs"><span class="small">Queue settings</span><span class="grow"></span>${dueSel}<span class="vsep"></span>${stepper}</div>
   <div class="detail wide"><h1>${ty.name}</h1><p class="lead">${ty.sub}. ${ty.fixed ? "Shown to every free agent the moment it arrives." : "Moving it up lifts it in every eligible agent's list at once."}</p>
     <h3 class="sh">Agents on this queue <span class="badge ${workers.length ? "neutral" : "muted"} hb">${workers.length}</span></h3>
     ${workers.length ? "" : `<div class="empty-line neutral" style="margin-bottom:10px">No agents on this queue. These tasks won't reach anyone until you add one.</div>`}
@@ -1417,8 +1561,8 @@ function liveCol() {
 function todayCenter() {
   const m = missed(), nNever = agentsFor("never");
   const card = (v, n, tone, label, sub) => `<button class="card3" data-act="mq" data-v="${v}"><span class="badge xl ${n ? tone : "muted"}">${n}</span><span class="c-l">${label}</span><span class="c-s">${sub}</span></button>`;
-  const rows = ["cmn", ...S.order].map((k, i) => { const ty = S.types[k], [o, p, old] = ty.stats, n = agentsFor(k);
-    return `<tr class="clickrow" data-act="mq" data-v="${k}"><td><span class="rank ${k === "cmn" ? "pin" : ""}">${k === "cmn" ? PIN : i}</span></td>
+  const rows = S.order.map((k, i) => { const ty = S.types[k], [o, p, old] = ty.stats, n = agentsFor(k);
+    return `<tr class="clickrow" data-act="mq" data-v="${k}"><td><span class="rank">${i + 1}</span></td>
       <td><div class="qtitle">${ty.name}</div><div class="lr-bar"><span style="width:${Math.max(o ? 3 : 0, Math.round(o / 217 * 100))}%"></span>${p ? `<span class="lr-late" style="width:${Math.round(p / 217 * 100)}%"></span>` : ""}</div></td>
       <td class="num">${o}</td><td>${p ? `<span class="badge red xs" style="margin:0">${p} past due</span>` : `<span class="small">On time</span>`}</td>
       <td class="small ${n ? "" : "late"}">${n ? `${n} agent${n > 1 ? "s" : ""}` : "No agents"}</td><td class="small">${old}</td></tr>`; }).join("");
@@ -1438,33 +1582,118 @@ function teamNow() {
   return `<div class="nowlist">${on.map(a => { const l = info(a), r = rank(a); return `<div class="nowrow"><div class="nw-top"><span class="nw-name">${a.name}</span>${r === 0 ? `<span class="tag warn">Held a while</span>` : r === 1 ? `<span class="tag">Free</span>` : ""}</div><span class="small">${l.txt}${l.m != null ? `, ${l.m} min` : ""}</span></div>`; }).join("")}
     ${off.length ? `<div class="nowrow off"><span class="small">Out: ${off.map(a => `${a.name} (${(a.outUntil || "Out today").replace("Out ", "")})`).join(", ")}</span></div>` : ""}</div>`;
 }
+const QTAB_IC = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>`;
+function qTabLabel(k) { return k === "missed" ? "Missed calls" : k === "pastdue" ? "Past due" : S.types[k] ? S.types[k].name : k; }
+function overviewTab() {
+  const m = missed(), f = S.qfilter || "all";
+  const rowsAll = S.order.map((k, i) => ({k, i}));
+  const late = x => S.types[x.k].stats[1] > 0 || !agentsFor(x.k);
+  const noag = x => !agentsFor(x.k);
+  const rows = f === "attention" ? rowsAll.filter(late) : f === "noagents" ? rowsAll.filter(noag) : rowsAll;
+  const sub = [["all","All queues",rowsAll.length],["attention","Needs attention",rowsAll.filter(late).length],["noagents","No agents",rowsAll.filter(noag).length]]
+    .map(([v, l, n]) => `<button class="subtab ${f === v ? "on" : ""}" data-act="qfilter" data-v="${v}">${l}<span>${n}</span></button>`).join("");
+  const card = (v, n, tone, label, s) => `<button class="card3" data-act="mq" data-v="${v}"><span class="badge xl ${n ? tone : "muted"}">${n}</span><span class="c-l">${label}</span><span class="c-s">${s}</span></button>`;
+  const tr = ({k, i}) => { const ty = S.types[k], [o, p, old] = ty.stats, n = agentsFor(k);
+    return `<tr class="clickrow qrow" draggable="true" data-drag="${k}" tabindex="0" data-act="mq" data-v="${k}" aria-label="${ty.name}, rank ${i + 1} of ${S.order.length}. Alt plus arrow keys to move.">
+      <td class="grip-td"><span class="grip" aria-hidden="true">${GRIP}</span></td><td><span class="rank">${i + 1}</span></td>
+      <td><div class="qtitle">${ty.name}</div><div class="lr-bar"><span style="width:${Math.max(o ? 3 : 0, Math.round(o / 217 * 100))}%"></span>${p ? `<span class="lr-late" style="width:${Math.round(p / 217 * 100)}%"></span>` : ""}</div></td>
+      <td class="num">${o}</td><td>${p ? `<span class="badge red xs" style="margin:0">${p} past due</span>` : `<span class="small">On time</span>`}</td>
+      <td>${n ? `<span class="small">${n} agent${n > 1 ? "s" : ""}</span>` : `<span class="badge red xs" style="margin:0">No agents</span>`}</td><td class="small">${old}</td>
+      <td class="chev-td">${CHEV}</td></tr>`; };
+  return `<div class="subtabs">${sub}</div><div class="detail wide qover">
+    <div class="cards cards3">${card("missed", m.length, "red", "Missed calls", m.length ? `${m[0].patient}, ${dur(NOW - m[0].sched)} late` : "All calls made")}${card("never", 217, "red", "Never contacted", agentsFor("never") ? `Rank ${rankOf("never")} of ${S.order.length}` : "No agents on it")}${card("pastdue", 40, "amber", "Past due", "All task types")}</div>
+    <div class="table-wrap"><table class="loadtable qtable"><thead><tr><th style="width:28px"></th><th style="width:40px"></th><th>Task type</th><th class="num">Open</th><th>Past due</th><th>Agents</th><th>Oldest</th><th style="width:28px"></th></tr></thead>
+    <tbody>${rows.length ? rows.map(tr).join("") : `<tr><td colspan="8" class="small" style="padding:20px 14px">Nothing here.</td></tr>`}</tbody></table></div></div>`;
+}
 function queuesPage() {
-  const c = S.mq === "today" ? todayCenter() : S.mq === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
-    : S.mq === "pastdue" ? viewCenter("Past due", "Across all task types, oldest first.", S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null).sort((a, b) => a.due - b.due), "Showing a sample of 40")
-    : typeCenter(S.mq);
-  return `<div class="tasks"><aside class="qcol" aria-label="Queues"><div class="qbar"><span class="small">${S.order.reduce((s, k) => s + S.types[k].stats[0], 0)} open tasks in ${S.order.length + 1} queues</span></div><div class="qscroll">${mqList()}</div></aside>
-    <section class="center">${c}</section><aside class="props">${liveCol()}</aside></div>`;
+  const tabs = S.qtabs || (S.qtabs = []);
+  const act = S.mq || "today";
+  const bar = `<div class="qtabs" role="tablist"><button class="qtab ${act === "today" ? "on" : ""}" role="tab" aria-selected="${act === "today"}" data-act="mq" data-v="today">${QTAB_IC}Queues<span class="badge ${act === "today" ? "accent" : "neutral"} xs">${S.order.length}</span></button>
+    ${tabs.map(k => `<span class="qtab open ${act === k ? "on" : ""}"><button role="tab" aria-selected="${act === k}" data-act="mq" data-v="${k}">${qTabLabel(k)}</button><button class="qx" data-act="closetab" data-v="${k}" aria-label="Close ${qTabLabel(k)}">×</button></span>`).join("")}</div>`;
+  const c = act === "today" ? overviewTab() : act === "missed" ? viewCenter("Missed scheduled calls", "A caregiver booked a time and nobody called. Agents see these above everything else.", missed())
+    : act === "pastdue" ? viewCenter("Past due", "Across all task types, oldest first.", S.tasks.filter(t => t.due < NOW && t.type !== "never" && t.status !== "done" && t.sched == null).sort((a, b) => a.due - b.due), "Showing a sample of 40")
+    : typeCenter(act);
+  return `<div class="qwrap">${bar}<div class="tasks qmode"><section class="center">${c}</section><aside class="props">${liveCol()}</aside></div></div>`;
 }
+const QDESC = {cmn:"Caregiver asked on the website to be called now", inbound:"Live calls to the enrollment line", sms:"Texts from caregivers", fmco:"First call to the MCO with the caregiver", escalation:"Texts haven't landed, so call instead", pson:"Get the statement from the provider's office", auth:"Chase the MCO after the nurse visit", never:"No attempt since the case was created"};
+const UEXTRA = {jasmine:["jasmine.okafor","3 months ago","#3B82F6"], marcus:["marcus.owens","1 year ago","#8B6CEF"], devon:["devon.adams","5 months ago","#2F7D3B"], trina:["trina.walsh","2 months ago","#B7892E"], sam:["sam.kowalski","8 months ago","#D9534F"], priya:["priya.nair","3 weeks ago","#0E7490"], aisha:["aisha.bello","6 months ago","#C2410C"], leo:["leo.martins","1 year ago","#6B7280"]};
+const OTHERS = [
+  {id:"kelsey", name:"Kelsey Anderson", email:"kelsey.anderson@brevy.com", sign:"Mission Control", role:"enrollment_manager", joined:"2 years ago", color:"#7C3AED", enroll:true},
+  {id:"admin", name:"Admin", email:"admin@brevy.com", sign:"Mission Control", role:"admin", joined:"2 years ago", color:"#2F7D3B", shield:true},
+  {id:"commsbot", name:"Comms Bot", email:"Service account", sign:null, role:null, joined:"1 year ago", svc:true},
+  {id:"automation", name:"Automation", email:"Service account", sign:null, role:"admin", joined:"1 year ago", svc:true, shield:true}
+];
+const initials = n => n.split(" ").map(x => x[0]).slice(0, 2).join("").toUpperCase();
+function uRows() {
+  const ag = S.agents.map(a => ({id:a.id, name:a.name, email:UEXTRA[a.id][0] + "@brevy.com", sign:"Mission Control", role:"enrollment_agent", joined:UEXTRA[a.id][1], color:UEXTRA[a.id][2], agent:a}));
+  return (S.ufilter || "enroll") === "all" ? [...ag, ...OTHERS] : [...ag, OTHERS[0]];
+}
+function uWarn(a) {
+  const same = (x, y) => x.length === y.length && x.every(v => y.includes(v));
+  if (!a.on) return "";
+  if (a.types.includes("inbound") && a.yesterday.includes("inbound")) return ["On inbound yesterday too", "Inbound all day two days running wears people out. Give it to someone else today."];
+  if (a.mcos.length && same(a.mcos, a.ymcos)) return ["Same MCO as yesterday", "Rotate MCOs so everyone keeps up with each one's process."];
+  if (same(a.types, a.yesterday) && a.types.length > 1) return ["Same work as yesterday", "Rotating task types keeps everyone able to cover for each other."];
+  return "";
+}
+const SHIELD = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linejoin="round" aria-label="Admin"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/></svg>`;
+const avatar = (u, big) => u.svc ? `<span class="uav ${big ? "big" : ""} none"></span>` : `<span class="uav ${big ? "big" : ""}" style="--c:${u.color}">${initials(u.name)}</span>`;
 function usersPage() {
-  const same = (a, b) => a.length === b.length && a.every(x => b.includes(x));
-  const tick = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
-  return `<div class="mgr">
-  <div class="utool"><label class="usearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input type="search" data-usearch placeholder="Search agents" aria-label="Search agents" autocomplete="off"></label>
-    <span class="small">Tick what each person works today and pick their MCOs. They only see those tasks.</span></div>
-  <div class="table-wrap"><table class="matrix"><thead><tr><th>Agent</th><th>MCOs</th>${TYPE_ORDER.map(k => `<th class="c">${SHORT[k]}</th>`).join("")}<th class="num">Worked</th><th class="num">Closed</th><th class="num" title="Tasks claimed ahead of the queue order today">Out of order</th></tr></thead><tbody>
-  ${S.agents.map(a => {
-    const warn = !a.on ? "" : a.types.includes("inbound") && a.yesterday.includes("inbound") ? "On inbound yesterday too" : a.mcos.length && same(a.mcos, a.ymcos) ? "Same MCO as yesterday" : same(a.types, a.yesterday) && a.types.length > 1 ? "Same work as yesterday" : "";
-    return `<tr class="${a.on ? "" : "off"}" data-uname="${a.name.toLowerCase()}"><td><div class="agent"><button class="toggle" aria-pressed="${a.on}" aria-label="${a.name} working today" data-act="onoff" data-a="${a.id}"></button>
-      <div class="acell"><div class="qtitle">${a.name}</div>${a.on ? `<div class="small">${warn ? `<span class="warnline">${warn}</span>` : "Working"}</div>` : dd({id:`out:${a.id}`, value:a.outUntil || "Out today", small:true, options:["Out today","Out until Fri, Oct 2","Out until Mon, Oct 12"].map(o => ({v:o, l:o}))})}</div></div></td>
-      <td>${a.on ? dd({id:`mco:${a.id}`, multi:true, value:a.mcos, display:mcoLabel(a), aria:`MCOs ${a.name} works`, options:[{v:"__all", l:"All MCOs"}, ...MCOS.map(m => ({v:m, l:m, sub:a.ymcos.includes(m) ? "Worked it yesterday" : ""}))]}) : `<span class="small">—</span>`}</td>
-      ${TYPE_ORDER.map(k => `<td class="c"><button class="cbx" role="checkbox" aria-checked="${a.types.includes(k)}" data-act="ttype" data-a="${a.id}" data-k="${k}" ${a.on ? "" : "disabled"} aria-label="${a.name} works ${S.types[k].name}">${a.types.includes(k) ? tick : ""}</button></td>`).join("")}
-      <td class="num">${a.worked}</td><td class="num">${a.closed}</td><td class="num">${a.ooo ? `<span class="badge amber hb">${a.ooo}</span>` : `<span class="small">0</span>`}</td></tr>`;
-  }).join("")}
-  <tr class="nomatch" hidden><td colspan="${TYPE_ORDER.length + 5}" class="small" style="padding:20px 14px">No agent matches.</td></tr>
-  <tr class="totals"><td class="small">Agents on each</td><td></td>${TYPE_ORDER.map(k => { const n = agentsFor(k); return `<td class="c"><span class="badge ${n ? "neutral" : "red"} hb">${n}</span></td>`; }).join("")}<td></td><td></td><td></td></tr>
-  </tbody></table></div></div>`;
+  const rows = uRows();
+  const tr = u => { const a = u.agent, w = a && uWarn(a);
+    return `<tr class="clickrow urow ${S.uopen === u.id ? "sel" : ""}" data-act="uopen" data-v="${u.id}" tabindex="0" data-uname="${esc((u.name + " " + u.email).toLowerCase())}">
+      <td><div class="ucell">${avatar(u)}<div><div class="uname">${esc(u.name)}${u.shield ? SHIELD : ""}</div><div class="small">${esc(u.email)}</div></div></div></td>
+      <td>${u.sign ? `<span class="uchip">${u.sign}</span>` : `<span class="umuted">No access</span>`}</td>
+      <td>${u.role ? `<span class="uchip">${u.role}</span>` : `<span class="umuted">None</span>`}</td>
+      <td>${a ? (a.on ? `${a.types.length} queue${a.types.length === 1 ? "" : "s"}<div class="small">${esc(mcoLabel(a))}</div>` : `<span class="umuted">—</span>`) : `<span class="umuted">—</span>`}</td>
+      <td>${a ? (a.on ? (w ? `<span class="tag warn">${w[0]}</span>` : `<span class="umuted">Working</span>`) : `<span class="tag">${esc(a.outUntil || "Out today")}</span>`) : `<span class="umuted">—</span>`}</td></tr>`; };
+  return `<div class="upage">
+  <div class="utool">${dd({id:"ufilter", label:"Filter", value:S.ufilter || "enroll", options:[{v:"enroll", l:"Enrollment team"}, {v:"all", l:"Everyone"}]})}
+    <label class="usearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input type="search" data-usearch placeholder="Search name or email..." aria-label="Search name or email" autocomplete="off"></label></div>
+  <div class="table-wrap"><table class="utable"><thead><tr><th>User</th><th>Can sign in to</th><th>Roles</th><th>Enrollment queues</th><th>Today</th></tr></thead><tbody>
+  ${rows.map(tr).join("")}
+  <tr class="nomatch" hidden><td colspan="5" class="small">No user matches.</td></tr>
+  </tbody></table></div></div>${S.uopen ? userDrawer(rows.find(u => u.id === S.uopen) || OTHERS.find(u => u.id === S.uopen)) : ""}`;
 }
+function usec(id, label, count, body, extra) {
+  const closed = (S.usec || {})[id];
+  return `<section class="usec ${closed ? "closed" : ""}"><div class="ushead"><button class="ushbtn" data-act="usec" data-v="${id}" aria-expanded="${!closed}">${label}${count != null ? `<span class="ucount">${count}</span>` : ""}</button>${extra || ""}<button class="iconbtn sm" data-act="usec" data-v="${id}" aria-label="${closed ? "Expand" : "Collapse"} ${label}">${CHEV}</button></div>${closed ? "" : `<div class="usbody">${body}</div>`}</section>`;
+}
+function ucheck(on, act, a, k, title, sub, disabled) {
+  const tick = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+  return `<button class="ucheck" role="checkbox" aria-checked="${on}" data-act="${act}" data-a="${a}" data-k="${esc(k)}" ${disabled ? "disabled" : ""}><span class="cbx" aria-hidden="true">${on ? tick : ""}</span><span><span class="uct">${title}</span>${sub ? `<span class="small">${sub}</span>` : ""}</span></button>`;
+}
+function userDrawer(u) {
+  if (!u) return "";
+  const a = u.agent, w = a && uWarn(a);
+  const lanes = (S.ulanes = S.ulanes || {})[u.id] || (S.ulanes[u.id] = u.enroll || a ? ["enrolling"] : []);
+  const log = ((S.ulog = S.ulog || {})[u.id] || []);
+  const status = a && !a.on ? `<span class="tag">${esc(a.outUntil || "Out today")}</span>` : "";
+  let h = `<div class="ubackdrop" data-act="uclose"></div><aside class="udrawer" role="dialog" aria-label="${esc(u.name)}">
+    <div class="udhead">${avatar(u, true)}<div class="udtitle"><div class="udname">${esc(u.name)}</div><div class="small">${esc(u.email)}</div>
+      <div class="udmeta"><span class="tag good">Active</span>${status}<span class="small">joined ${u.joined}</span></div></div>
+      <button class="iconbtn" data-act="uclose" aria-label="Close">×</button></div><div class="udbody">`;
+  if (w) h += `<div class="uattn"><div class="uattnh"><span>⚠ Needs attention</span><span>1 item</span></div><div class="uattnb"><b>${w[0]}</b><div class="small">${w[1]}</div></div></div>`;
+  h += usec("sign", "Can sign in to", null, u.sign ? `<div class="uapp"><b>${u.sign}</b><span class="small">via ${u.role}</span></div><div class="small">No access to Skydeck, Modis, Polaris or Internal.</div>` : `<div class="small">No access to any app.</div>`);
+  h += usec("roles", "Roles", u.role ? 1 : 0, u.role ? `<span class="uchip x">${u.role}<span aria-hidden="true">×</span></span>` : `<div class="small">No roles.</div>`, `<button class="iconbtn sm" data-act="nyi" aria-label="Add role">+</button>`);
+  const LANES = [["leads","Leads","People whose case is still a lead"],["enrolling","Enrolling","Cases moving through enrollment"],["operational","Operational","Active cases receiving care"],["other","Other","The front door, unknown numbers and senders no rule can place"]];
+  h += usec("lanes", "Communication lanes", lanes.length, LANES.map(([k, t, d]) => ucheck(lanes.includes(k), "ulane", u.id, k, t, d)).join("") + `<p class="small unote">Lanes decide which conversations reach this user's queue in the comms inbox.</p>`);
+  if (a) {
+    const qs = TYPE_ORDER.map(k => { const n = agentsFor(k), mine = a.types.includes(k);
+      const sub = [QDESC[k], a.yesterday.includes(k) ? "Worked it yesterday" : "", a.on && mine && n === 1 ? `<span class="warnline">Only person on it</span>` : !mine && n === 0 ? `<span class="late">Nobody on it</span>` : ""].filter(Boolean).join(" · ");
+      return ucheck(mine, "ttype", a.id, k, S.types[k].name, sub, !a.on); }).join("");
+    h += usec("enroll", "Enrollment queues", a.on ? a.types.length : 0, `<div class="uavail"><button class="toggle" aria-pressed="${a.on}" aria-label="${esc(a.name)} works today" data-act="onoff" data-a="${a.id}"></button><div><div class="uct">${a.on ? "Works today" : "Out"}</div>${a.on ? `<div class="small">Takes tasks from the queues below</div>` : dd({id:`out:${a.id}`, value:a.outUntil || "Out today", small:true, options:["Out today","Out until Fri, Oct 2","Out until Mon, Oct 12"].map(o => ({v:o, l:o}))})}</div></div>${qs}<p class="small unote">Queues decide which tasks reach this person's My Tasks. They only see tasks from ticked queues.</p>`);
+    const allM = !a.mcos.length;
+    h += usec("mcos", "MCOs", allM ? "All" : a.mcos.length, ucheck(allM, "tmco", a.id, "__all", "All MCOs", "Any MCO in the ticked queues", !a.on) + MCOS.map(m => ucheck(!allM && a.mcos.includes(m), "tmco", a.id, m, m, a.ymcos.includes(m) ? "Worked it yesterday" : "", !a.on)).join(""));
+    const card = (l, v) => `<div class="ucard"><div class="ucl">${l}</div><div class="ucv">${v}</div></div>`;
+    h += usec("today", "Today", null, `<div class="ucards">${card("Worked", a.worked)}${card("Closed", a.closed)}${card("Out of order", a.ooo ? `<span class="tag warn">${a.ooo}</span>` : "0")}${card("Right now", esc(a.now || (a.on ? "Nothing claimed" : "Out")))}</div>`);
+  }
+  h += usec("changes", "Recent changes", null, log.length ? `<ul class="ulog">${log.map(x => `<li><span>${x}</span><span class="small">just now</span></li>`).join("")}</ul>` : `<div class="small">Nothing has changed about this account yet.</div>`, `<a href="#" class="tasklink" data-act="nyi">View all</a>`);
+  h += `</div></aside>`;
+  return h;
+}
+function ulog(id, msg) { (S.ulog = S.ulog || {}); (S.ulog[id] = S.ulog[id] || []).unshift(`Kelsey Anderson ${msg}`); }
 // ---------- shell ----------
 let toastTimer;
 function toast(msg) { S.toast = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; render(); }, 5000); }
@@ -1498,6 +1727,7 @@ function render() {
   const alerts = missed().length + (agentsFor("never") ? 0 : 1);
   const hasProps = S.view === "tasks" || S.view === "queues";
   const ic = d => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/>${d}</svg>`;
+  const udScroll = document.querySelector(".udbody")?.scrollTop || 0;
   document.getElementById("app").innerHTML = `<div class="app ${S.navOpen ? "" : "nav-closed"}">
     <nav class="side" aria-label="Main"><div class="logo"><b>Mission Control</b><button class="iconbtn navtoggle" data-act="togglenav" aria-label="${S.navOpen ? "Collapse" : "Expand"} navigation" title="${S.navOpen ? "Collapse" : "Expand"} navigation"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/>${S.navOpen ? '<path d="M15.5 10l-2 2 2 2"/>' : '<path d="M13.5 10l2 2-2 2"/>'}</svg></button></div>
       ${NAV.map(([id, l, x]) => nav(id, l, id === "tasks" ? q.length + (S.held ? 1 : 0) : x)).join("")}
@@ -1516,12 +1746,13 @@ function render() {
         <button data-act="sc" data-v="away">Call me now while on another page<small>Floating alert outside My Tasks</small></button>
         <button data-act="sc" data-v="collide">Two agents claim the same task<small>Devon wins your next Claim next</small></button>
         <button data-act="sc" data-v="idle">Jasmine goes quiet for 5 minutes<small>Untouched claimed task returns to the pool</small></button>
-        <button data-act="sc" data-v="wake">Paused tasks wake up<small>They come back open, for anyone</small></button>
+        <button data-act="sc" data-v="wake">Paused tasks wake up<small>They come back as To Do, for anyone</small></button>
         <hr><button data-act="sc" data-v="reset">Start over<small>Resets all data</small></button></div>` : ""}</div></div>
     ${float}${S.toast ? `<div class="toast" role="status">${esc(S.toast)}</div>` : ""}`;
   tick();
   growAll();
   if (S.agentPick) document.querySelector("[data-agentq]")?.focus();
+  const ud = document.querySelector(".udbody"); if (ud && udScroll) ud.scrollTop = udScroll;
   placeDD();
 }
 function growAll() { document.querySelectorAll("[data-grow]").forEach(grow); }
@@ -1643,12 +1874,16 @@ document.addEventListener("click", e => {
     case "panel": S.err = null; if (S.panel?.variant === v) { S.panel = null; break; } S.panel = {kind:"release", variant:"release"}; S.choice = {reason:PANELS.release.reasons[0]}; break;
     case "choose": S.choice[k] = v; break;
     case "confirm": return finish();
-    case "mq": S.mq = v === "never" ? "never" : v; S.mfilter = "all"; S.agentPick = false; break;
+    case "mq": S.mq = v; S.qtabs = S.qtabs || []; if (v !== "today" && !S.qtabs.includes(v)) S.qtabs.push(v); S.mfilter = "all"; S.agentPick = false; break;
+    case "closetab": S.qtabs = (S.qtabs || []).filter(x => x !== v); if (S.mq === v) S.mq = S.qtabs[S.qtabs.length - 1] || "today"; break;
+    case "qfilter": S.qfilter = v; break;
     case "mfilter": S.mfilter = v; break;
     case "psec": S.pc = S.pc || {}; S.pc[v] = !S.pc[v]; break;
     case "showmore": { S.expanded = S.expanded || {}; const q = queue(), sel = currentSel(), items = q.filter(x => grp(x) === +v), selIdx = sel ? items.findIndex(x => x.key === sel.key) : -1; const isOpen = S.expanded[v] || selIdx >= 5; S.expanded[v] = !isOpen; if (isOpen && selIdx >= 5) S.sel = items[0].key; break; }
     case "clearagents": { const n = S.agents.filter(a => a.on && a.types.includes(k)).length; S.agents.forEach(a => { a.types = a.types.filter(x => x !== k); }); toast(`Removed ${n} agent${n === 1 ? "" : "s"} from ${tname(k)}.`); break; }
     case "tasklink": e.preventDefault(); toast(`${v} opens as its own task in MC.`); break;
+    case "actall": S.actAll = !S.actAll; break;
+    case "postnote": { const t = byKey(key); const txt = ((S.drafts || {})[key] || "").trim(); if (!txt) { toast("Write something first."); break; } t.userNotes = [...(t.userNotes || []), {text:txt, time:"Now", at:Date.now()}]; S.drafts[key] = ""; if (S.held === key) S.touched = true; toast("Note posted to the timeline."); break; }
     case "livescope": S.liveScope = v; break;
     case "ddopen": S.dd = S.dd === v ? null : v; S.agentPick = false; break;
     case "ddpick": return ddPick(b.dataset.dd, v);
@@ -1666,8 +1901,14 @@ document.addEventListener("click", e => {
     case "gotoq": S.view = "queues"; S.mq = v; S.mfilter = "all"; break;
     case "rank": { moveType(k, S.order.indexOf(k) + +v); break; }
     case "tpreset": { const t = byKey(key); t.pOver = null; if (S.notice === t.key) S.notice = null; break; }
-    case "onoff": { const ag = agent(a); ag.on = !ag.on; break; }
-    case "ttype": { const ag = agent(a); ag.types = ag.types.includes(k) ? ag.types.filter(x => x !== k) : [...ag.types, k]; break; }
+    case "onoff": { const ag = agent(a); ag.on = !ag.on; ulog(a, ag.on ? "marked them as working today" : "marked them as out"); break; }
+    case "ttype": { const ag = agent(a), had = ag.types.includes(k); ag.types = had ? ag.types.filter(x => x !== k) : [...ag.types, k]; ulog(a, `${had ? "removed" : "added"} ${S.types[k].name}`); break; }
+    case "tmco": { const ag = agent(a); if (k === "__all") ag.mcos = []; else { const had = ag.mcos.includes(k); ag.mcos = had ? ag.mcos.filter(x => x !== k) : [...ag.mcos, k]; if (ag.mcos.length === MCOS.length) ag.mcos = []; } ulog(a, `set MCOs to ${mcoLabel(ag)}`); break; }
+    case "ulane": { const L = S.ulanes[a]; S.ulanes[a] = L.includes(k) ? L.filter(x => x !== k) : [...L, k]; break; }
+    case "uopen": S.uopen = v; break;
+    case "uclose": S.uopen = null; break;
+    case "usec": S.usec = S.usec || {}; S.usec[v] = !S.usec[v]; break;
+    case "nyi": e.preventDefault(); toast("Not part of this prototype."); break;
   }
   render();
 });
@@ -1684,6 +1925,7 @@ document.addEventListener("change", e => {
 });
 function grow(el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
 document.addEventListener("input", e => {
+  if (e.target.matches("[data-draft]")) { S.drafts = S.drafts || {}; S.drafts[e.target.dataset.draft] = e.target.value; return; }
   if (e.target.matches("[data-usearch]")) {
     const q = e.target.value.trim().toLowerCase(); let n = 0;
     document.querySelectorAll("tr[data-uname]").forEach(r => { const m = r.dataset.uname.includes(q); r.hidden = !m; if (m) n++; });
@@ -1715,6 +1957,7 @@ document.addEventListener("keydown", e => {
   const dr = e.target.closest && e.target.closest("[data-drag]");
   if (dr && e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) { e.preventDefault(); const k = dr.dataset.drag; moveType(k, S.order.indexOf(k) + (e.key === "ArrowUp" ? -1 : 1)); render(); document.querySelector(`[data-drag="${k}"]`)?.focus(); return; }
   if (dr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); dr.click(); return; }
+  if (e.key === "Escape" && S.uopen && !S.dd) { S.uopen = null; render(); return; }
   if (e.key === "Escape" && (S.agentPick || S.dd || S.ooo)) { S.agentPick = false; S.dd = null; S.ooo = null; render(); return; }
   if (e.target.closest("input,textarea,select") || e.metaKey || e.ctrlKey || e.altKey || S.view !== "tasks") return;
   const key = e.key.toLowerCase();
