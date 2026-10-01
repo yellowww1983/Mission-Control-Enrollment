@@ -909,6 +909,20 @@ body{background:#F4F3F1}
 .ucv{font-weight:500}
 .ulog{list-style:none;padding:0;margin:0}
 .ulog li{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.ptop{display:flex;align-items:center;justify-content:space-between;gap:12px;height:52px;padding:0 20px;box-sizing:border-box;border-bottom:1px solid var(--line)}
+.ptop>div{min-width:0}
+.ptn{font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptop .btn{flex:none}
+.ptop{gap:8px}
+.ptop .btn.sm{padding:0 6px 0 9px;gap:6px}
+.ptop .btn kbd{margin-left:0}
+.ptop .small{line-height:1.25}
+.ptop .btn.sm{height:30px;padding:0 10px}
+.ptabs{display:flex;gap:4px;padding:0 10px;height:52px;align-items:stretch;border-bottom:1px solid var(--line);box-sizing:border-box}
+.ptab{display:inline-flex;align-items:center;padding:0 10px;border:0;border-bottom:2px solid transparent;background:transparent;font:inherit;font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer}
+.ptab:hover{color:var(--ink)}
+.ptab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.pplay{padding:18px 20px}
 </style>
 </head>
 <body>
@@ -1271,10 +1285,13 @@ function props() {
   const sop = SOP[`${t.type}:${t.mco}`] || SOP[t.type] || [];
   const status = stChip(realStatus(t)) + (t.status === "paused" ? `<div class="small">Hidden from the pool until ${t.pausedUntil}</div>` : "");
   const link = (c, k, v) => `<div class="plink stack"><span class="dot" style="background:${c}"></span><span class="pk">${k}</span><span class="pv">${esc(v)}</span></div>`;
-  return `<section class="psec ${pc("case")}">${phead("case","Case")}<div class="pbody">
+  const tab = S.ptab === "playbook" && sop.length ? "playbook" : "case";
+  const top = `<div class="ptop"><div><div class="ptn">${esc(t.patient)}</div><div class="small">Patient · ${t.id}</div></div><button class="btn sm" data-act="tasklink" data-v="The case page" aria-keyshortcuts="E">Open case<kbd>E</kbd></button></div>
+  <div class="ptabs" role="tablist"><button role="tab" class="ptab ${tab === "case" ? "on" : ""}" aria-selected="${tab === "case"}" data-act="ptab" data-v="case">Case</button>${sop.length ? `<button role="tab" class="ptab ${tab === "playbook" ? "on" : ""}" aria-selected="${tab === "playbook"}" data-act="ptab" data-v="playbook">Playbook</button>` : ""}</div>`;
+  if (tab === "playbook") return top + `<div class="pplay"><div class="sophead"><span class="tag">${tname(t.type)}</span>${t.mco !== "Unknown" ? `<span class="tag">${esc(t.mco)}</span>` : ""}</div><ol class="sopsteps">${sop.map((s, i) => `<li><span class="sopn">${i + 1}</span><span class="soptxt">${esc(s)}</span></li>`).join("")}</ol><div class="sopfoot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg>Enrollment SOP<a href="#" class="tasklink" data-act="tasklink" data-v="The full SOP">Open full SOP</a></div></div>`;
+  return top + `<section class="psec ${pc("case")}">${phead("case","Case")}<div class="pbody">
     ${link("#8B6CEF","Case",t.id)}${link("#D9534F","Patient",t.patient)}${link("#3B82F6","Caregiver",t.cg)}${link("#B7892E","MCO",t.mco)}
     <div class="plink stack last"><span class="dot" style="background:#8C867C"></span><span class="pk">Step</span><span class="pv">${tname(t.type)}</span></div></div></section>
-    ${sop.length ? `<section class="psec ${pc("sop")}">${phead("sop","How to handle")}<div class="pbody"><div class="sophead"><span class="tag">${tname(t.type)}</span>${t.mco !== "Unknown" ? `<span class="tag">${esc(t.mco)}</span>` : ""}</div><ol class="sopsteps">${sop.map((s, i) => `<li><span class="sopn">${i + 1}</span><span class="soptxt">${esc(s)}</span></li>`).join("")}</ol><div class="sopfoot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg>Enrollment SOP<a href="#" class="tasklink" data-act="tasklink" data-v="The full SOP">Open full SOP</a></div></div></section>` : ""}
     <section class="psec ${pc("props")}">${phead("props","Properties")}<div class="pbody"><dl class="pdl">
     <dt>Status</dt><dd>${status}</dd>
     <dt>Due</dt><dd>${t.due < NOW ? `<span class="late">${dur(NOW - t.due)} ago</span>` : `In ${dur(t.due - NOW)}`}</dd>
@@ -1882,6 +1899,7 @@ document.addEventListener("click", e => {
     case "qfilter": S.qfilter = v; break;
     case "mfilter": S.mfilter = v; break;
     case "psec": S.pc = S.pc || {}; S.pc[v] = !S.pc[v]; break;
+    case "ptab": S.ptab = v; break;
     case "showmore": { S.expanded = S.expanded || {}; const q = queue(), sel = currentSel(), items = q.filter(x => grp(x) === +v), selIdx = sel ? items.findIndex(x => x.key === sel.key) : -1; const isOpen = S.expanded[v] || selIdx >= 5; S.expanded[v] = !isOpen; if (isOpen && selIdx >= 5) S.sel = items[0].key; break; }
     case "clearagents": { const n = S.agents.filter(a => a.on && a.types.includes(k)).length; S.agents.forEach(a => { a.types = a.types.filter(x => x !== k); }); toast(`Removed ${n} agent${n === 1 ? "" : "s"} from ${tname(k)}.`); break; }
     case "tasklink": e.preventDefault(); toast(`${v} opens as its own task in MC.`); break;
@@ -1965,6 +1983,7 @@ document.addEventListener("keydown", e => {
   if (e.target.closest("input,textarea,select") || e.metaKey || e.ctrlKey || e.altKey || S.view !== "tasks") return;
   const key = e.key.toLowerCase();
   if (key === "n" && !S.held && !(urgentTask() && me().types.includes("cmn"))) { e.preventDefault(); takeNext(); }
+  else if (key === "e" && document.querySelector(".ptop [aria-keyshortcuts=E]")) { e.preventDefault(); document.querySelector(".ptop [aria-keyshortcuts=E]").click(); }
   else if (key === "c" && !S.held) { const t = currentSel(); if (t) { e.preventDefault(); claim(t.key); } }
   else if (key === "j" || e.key === "ArrowDown") { e.preventDefault(); moveSel(1); }
   else if (key === "k" || e.key === "ArrowUp") { e.preventDefault(); moveSel(-1); }
